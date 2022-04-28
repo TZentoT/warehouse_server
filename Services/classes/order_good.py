@@ -37,8 +37,8 @@ class OrderGoods(models.Model):
                     if good["code"] == order["id"]:
                         # TODO научиться добавлять новые свойства
                         goods.append(good)
-                        # goods[-1]["amount"] = order["amount"]
-                        # goods[-1]["price"] = order["price"]
+                        goods[-1]["amount"] = order["amount"]
+                        goods[-1]["price"] = order["price_one"]
         except Exception as e:
             print(f"get_good_types_by_order went wrong: {e}")
 

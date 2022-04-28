@@ -48,12 +48,13 @@ def shipment_orders(request, path):
     if path == "/shipment_order_goods_id":
         status = request.GET.get('status')
         order_id = request.GET.get('order_id')
-        result = shipment_order.ShipmentOrder().get_orders(order_id, status)
+        result = shipment_order.ShipmentOrder().get_orders_with_fullness(order_id, status)
 
     if path == "/shipment_order_goods_all":
         result = "getShipmentOrderGoodsAll"
 
     if path == "/update_shipment_orders":
+        # TODO написать код
         result = "updateShipmentOrders"
 
     return HttpResponse(string_converter.StringConverter().convert(result))
