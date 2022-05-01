@@ -43,7 +43,9 @@ def shelfs(request, path):
 def shipment_orders(request, path):
     result = ""
     if path == "/shipment_order_goods":
-        result = "getShipmentOrderGoods"
+        order_type = request.GET.get('type')
+        status = request.GET.get('status')
+        result = shipment_order.ShipmentOrder().get_shipment_orders(order_type, status)
 
     if path == "/shipment_order_goods_id":
         status = request.GET.get('status')
@@ -64,6 +66,7 @@ def orders(request, path):
     result = ""
 
     if path == "/orders":
+        # TODO написать код
         result = "getOrders"
 
     if path == "/orders_all":
@@ -89,7 +92,8 @@ def orders(request, path):
         result = "updateOrderGoodsExpend"
 
     if path == "/update_order_status":
-        result = "updateOrderStatus"
+        id = request.GET.get("id")
+        result = order.Order().update_orders(id)
 
     if path == "/post_order":
         result = "postNewOrder"
@@ -117,7 +121,7 @@ def types(request, path):
         result = "getGoodsTypeByCode"
 
     if path == "/goods_type_cats":
-        result = "getGoodsTypeWithCat"
+        result = good_type.GoodType().get_good_types_with_cats()
 
     if path == "/goods_type":
         result = good_type.GoodType().get_good_types()

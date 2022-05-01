@@ -1,50 +1,24 @@
 from django.db import models, connection
 
 from .shipment_order_good import ShipmentOrderGoods
+from .order import Order
 
 
 class ShipmentOrder(models.Model):
 
-    def get_orders(self, order, status):
+    def get_orders(self, order=0, status=''):
         data = ""
         try:
             cursor = connection.cursor()
-            cursor.execute(f"SELECT * FROM shipment_order WHERE order_id={order} AND status "
+            if order != 0 & status != '':
+                cursor.execute(f"SELECT * FROM shipment_order WHERE order_id={order} AND status "
                            f"LIKE '{status}' ORDER BY code ASC")
-            rows = cursor.fetchall()
-            result = []
-            keys = ('code', 'name', 'shipment_date', 'shipment_status', 'shipment_payment', 'note', 'shipment_price',
-                    'requisites', 'status', 'order_id')
-            for row in rows:
-                result.append(dict(zip(keys, row)))
-            data = result
-        except Exception as e:
-            print(f"getOrders went wrong: {e}")
-
-        return data
-
-    def get_orders(self, order):
-        data = ""
-        try:
-            cursor = connection.cursor()
-            cursor.execute(f"SELECT * FROM shipment_order WHERE order_id={order} AND status ORDER BY code ASC")
-            rows = cursor.fetchall()
-            result = []
-            keys = ('code', 'name', 'shipment_date', 'shipment_status', 'shipment_payment', 'note', 'shipment_price',
-                    'requisites', 'status', 'order_id')
-            for row in rows:
-                result.append(dict(zip(keys, row)))
-            data = result
-        except Exception as e:
-            print(f"getOrders went wrong: {e}")
-
-        return data
-
-    def get_orders(self):
-        data = ""
-        try:
-            cursor = connection.cursor()
-            cursor.execute(f"SELECT * FROM shipment_order AND status ORDER BY code ASC")
+            if status == '':
+                cursor.execute(f"SELECT * FROM shipment_order WHERE order_id={order} AND status ORDER BY code ASC")
+            if order == 0 & status == '':
+                cursor.execute(f"SELECT * FROM shipment_order AND status ORDER BY code ASC")
+            if order == 0 & status != '':
+                cursor.execute(f"SELECT * FROM shipment_order WHERE status LIKE '{status}%' ORDER BY code ASC")
             rows = cursor.fetchall()
             result = []
             keys = ('code', 'name', 'shipment_date', 'shipment_status', 'shipment_payment', 'note', 'shipment_price',
@@ -107,3 +81,16 @@ class ShipmentOrder(models.Model):
             print(f"get_orders_with_fullness went wrong: {e}")
 
         return data
+
+    def get_shipment_orders(self, order_type, status):
+        data = []
+        orders = Order.get_orders('', order_type)
+        shipments = self.get_orders(0, status)
+
+        for shipment in shipments:
+            for order in orders:
+                if order['id']==shipment['id']:
+                    data.append(shipment)
+
+        return data
+

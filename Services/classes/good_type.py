@@ -1,6 +1,7 @@
 
 from django.db import models, connection
-
+from .subcategories_2 import Subcategories2
+from .categories import Categories
 
 class GoodType(models.Model):
 
@@ -18,6 +19,27 @@ class GoodType(models.Model):
             for row in rows:
                 result.append(dict(zip(keys, row)))
             data = result
+            print(f'res {data}')
+        except Exception as e:
+            print(f"get_good_types went wrong: {e}")
+
+        return data
+
+    def get_good_types_with_cats(self):
+        data = ""
+        try:
+            goods = self.get_good_types()
+            subcategories = Subcategories2().get_subcategories()
+            categories = Categories().get_categories()
+
+            for element in goods:
+                for category in categories:
+                    if category['code'] == element['category']:
+                        element['category'] = category['name']
+                for subcategory in subcategories:
+                    if subcategory['code'] == element['subcategory_2']:
+                        element['subcategory_2'] = subcategory['name']
+            data = goods
             print(f'res {data}')
         except Exception as e:
             print(f"get_good_types went wrong: {e}")

@@ -107,6 +107,46 @@ class ShipmentOrderGoods(models.Model):
                 ShipmentOrder().insert_orders(new_id + iterator, shipment['shipmentNumber'], shipment['shipmentDate'],
                                               shipment_status, shipment_payment,
                                               int(shipment['shipmentCost'], 'opened'), body['order_id'])
-        shipment_orders_in_db = ShipmentOrder().get_orders(body['order_id'])
+
+                order_num = new_id + iterator
+                if len(shipment['goodsInOrder']) != 0:
+                    for good in shipment['goodsInOrder']:
+                        array_id = self.get_order_goods()
+                        new_id = array_id[len(array_id) - 1]['code']
+                        self.insert_ordered_goods(new_id + iterator, good['goodCode'], good['expectingAmount'],
+                                                  order_num)
+                        iterator += 1
+                iterator += 1
+            else:
+                check = True
+                shipmentFromBd = ''
+                shipment_orders_in_db = ShipmentOrder().get_orders(body['order_id'])
+                for sample in shipment_orders_in_db:
+                    if sample['code']==shipment['code']:
+                        check = False
+                        shipmentFromBd = sample
+                if check: array_for_delete.append(shipmentFromBd)
+                else:
+                    ShipmentOrder().update_orders(shipment['shipmentNumber'], shipment['shipmentDate'],
+                                                      shipment_payment, int(shipment['shipmentCost']), shipment['code'])
+                    iterator = 1
+                    for good in shipment['goodsInOrder']:
+                        if good['shipmentOrderGoodsCode'] == 0:
+                            array_id = self.get_order_goods()
+                            new_id = array_id[len(array_id) - 1]['code']
+                            self.insert_ordered_goods(new_id+iterator, good['goodCode'], good['expectingAmount'],
+                                                      good['code'])
+                            iterator += 1
+                        else:
+                            self.update_ordered_goods(good['expectingAmount'], good['shipmentOrderGoodsCode'])
+
+                    shipmentOrderGoodsFromBd = self.get_order_goods(shipment['code'])
+                    for good in shipment['goodsInOrder']:
+                        check = True
+                        for good1 in shipmentOrderGoodsFromBd:
+                            if good['goodCode'] == good1['goods']:
+                                check = False
+                            if check:
+                                self.delete_ordered_goods(good['shipmentOrderGoodsCode'], 0)
 
         return data
