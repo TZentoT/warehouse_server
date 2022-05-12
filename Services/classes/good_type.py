@@ -19,7 +19,7 @@ class GoodType(models.Model):
             for row in rows:
                 result.append(dict(zip(keys, row)))
             data = result
-            print(f'res {data}')
+            print(f'get_good_types {data}')
         except Exception as e:
             print(f"get_good_types went wrong: {e}")
 
@@ -46,4 +46,13 @@ class GoodType(models.Model):
 
         return data
 
+    def update(self, amount, code):
+        data = ""
+        try:
+            cursor = connection.cursor()
+            cursor.execute(f"UPDATE goods_type SET amount=amount - {amount} WHERE code={code}")
+        except Exception as e:
+            print(f"get_good_types went wrong: {e}")
+
+        return data
 

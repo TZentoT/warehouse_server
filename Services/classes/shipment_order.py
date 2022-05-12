@@ -1,23 +1,24 @@
 from django.db import models, connection
 
-from .shipment_order_good import ShipmentOrderGoods
-from .order import Order
+from .shipment_order_good import ShipmentOrderGood
+from ..converters.datetime_converter import DatetimeConverter
 
 
 class ShipmentOrder(models.Model):
 
     def get_orders(self, order=0, status=''):
         data = ""
+
         try:
             cursor = connection.cursor()
-            if order != 0 & status != '':
+            if order != 0 and status != '':
                 cursor.execute(f"SELECT * FROM shipment_order WHERE order_id={order} AND status "
                            f"LIKE '{status}' ORDER BY code ASC")
-            if status == '':
-                cursor.execute(f"SELECT * FROM shipment_order WHERE order_id={order} AND status ORDER BY code ASC")
-            if order == 0 & status == '':
-                cursor.execute(f"SELECT * FROM shipment_order AND status ORDER BY code ASC")
-            if order == 0 & status != '':
+            if order != 0 and status == '':
+                cursor.execute(f"SELECT * FROM shipment_order WHERE order_id={order} ORDER BY code ASC")
+            if order == 0 and status == '':
+                cursor.execute(f"SELECT * FROM shipment_order ORDER BY code ASC")
+            if order == 0 and status != '':
                 cursor.execute(f"SELECT * FROM shipment_order WHERE status LIKE '{status}%' ORDER BY code ASC")
             rows = cursor.fetchall()
             result = []
@@ -26,17 +27,22 @@ class ShipmentOrder(models.Model):
             for row in rows:
                 result.append(dict(zip(keys, row)))
             data = result
+            print(f"get_orders {data}")
         except Exception as e:
             print(f"getOrders went wrong: {e}")
 
         return data
 
-    def update_orders(self, name, shipment_date, shipment_payment, shipment_price, code):
+    def update_orders(self, name="", shipment_date="", shipment_payment="", shipment_price="", code=-1):
         data = ""
         try:
             cursor = connection.cursor()
-            cursor.execute(f"UPDATE shipment_order SET name='{name}', shipment_date='{shipment_date}', "
-                           f"shipment_payment='{shipment_payment}', shipment_price='{shipment_price}' WHERE code={code}")
+            if name != "" and shipment_date != "" and shipment_payment != "" and shipment_price != "" and code != -1:
+                cursor.execute(f"UPDATE shipment_order SET name='{name}', shipment_date='{shipment_date}', "
+                           f"shipment_payment='{shipment_payment}', shipment_price='{shipment_price}' "
+                               f"WHERE code={code}")
+            if name == "" and shipment_date == "" and shipment_payment == "" and shipment_price == "" and code != -1:
+                cursor.execute(f"UPDATE shipment_order SET status='closed' WHERE code={code}")
         except Exception as e:
             print(f"update_orders went wrong: {e}")
 
@@ -45,6 +51,9 @@ class ShipmentOrder(models.Model):
     def delete_orders(self, code):
         data = ""
         try:
+            goods = ShipmentOrderGood().get_order_goods(code)
+            if len(goods) != 0:
+                ShipmentOrderGood().delete_ordered_goods(0, code)
             cursor = connection.cursor()
             cursor.execute(f"DELETE from shipment_order WHERE code={code}")
         except Exception as e:
@@ -56,41 +65,13 @@ class ShipmentOrder(models.Model):
                       order_id):
         data = ""
         try:
+            date = DatetimeConverter().convert(shipment_date)
             cursor = connection.cursor()
             cursor.execute(f"INSERT INTO shipment_order (code, name, shipment_date, shipment_status, shipment_payment, "
-                           f"shipment_price, status, order_id) VALUES ({code}, {name}, {shipment_date},"
-                           f"{shipment_status}, {shipment_payment}, {shipment_price}, {status}, {order_id})")
+                           f"shipment_price, status, order_id) VALUES ({code}, '{name}', '{date}',"
+                           f"'{shipment_status}', '{shipment_payment}', '{shipment_price}', '{status}', {order_id})")
         except Exception as e:
             print(f"insert_orders went wrong: {e}")
-
-        return data
-
-    def get_orders_with_fullness(self, order, status):
-        data = self.get_orders(order, status)
-        try:
-            for order in data:
-                fullness = ShipmentOrderGoods.get_ordered_goods(order["code"])
-                if (len(fullness) == 0):
-                    fullness = "Пустой"
-
-                else:
-                    fullness = "Ожидается"
-
-                order["status_fullness"] = fullness
-        except Exception as e:
-            print(f"get_orders_with_fullness went wrong: {e}")
-
-        return data
-
-    def get_shipment_orders(self, order_type, status):
-        data = []
-        orders = Order.get_orders('', order_type)
-        shipments = self.get_orders(0, status)
-
-        for shipment in shipments:
-            for order in orders:
-                if order['id']==shipment['id']:
-                    data.append(shipment)
 
         return data
 

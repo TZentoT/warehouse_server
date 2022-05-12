@@ -9,8 +9,8 @@ urlpatterns = [
     path('racks/',          views.racks, {'path': '/racks'}),
     path('racks_by_zone/',  views.racks, {'path': '/racks_by_zone'}),
 
-    path('shelfs/',             views.shelfs, {'path': '/shelfs'}),
-    path('shelfs_by_racks/',    views.shelfs, {'path': '/shelfs_by_racks'}),
+    path('shelfs/', views.shelfs, {'path': '/shelfs'}),
+    path('shelfs_by_racks/', views.shelfs, {'path': '/shelfs_by_racks'}),
 
     path('goods_type_code/',    views.types, {'path': '/goods_type_code'}),
     path('goods_type_cats/',    views.types, {'path': '/goods_type_cats'}),
@@ -35,13 +35,15 @@ urlpatterns = [
     path('update_order_goods_expend/',      views.orders, {'path': '/update_order_goods_expend'}),
     path('update_order_status/',            views.orders, {'path': '/update_order_status'}),
 
-    path('update_shelf_space_status/',  views.shelf_space, {'path': '/update_shelf_space_status'}),
-    path('post_goods_to_shelfs/',       views.shelf_space, {'path': '/post_goods_to_shelfs'}),
-    path('shelf_space/',                views.shelf_space, {'path': '/shelf_space'}),
-    path('shelf_set/',                  views.shelf_space, {'path': '/shelf_set'}),
+    path('update_shelf_space_status/',  views.shelf_spaces, {'path': '/update_shelf_space_status'}),
+    path('post_goods_to_shelfs/',       views.shelf_spaces, {'path': '/post_goods_to_shelfs'}),
+    path('shelf_space/',                views.shelf_spaces, {'path': '/shelf_space'}),
+    path('shelf_set/',                  views.shelf_spaces, {'path': '/shelf_set'}),
 
-    path('update_shipment_orders/', views.shipment_orders, {'path': '/update_shipment_orders'}),
-    path('shipment_order_goods/', views.shipment_orders, {'path': '/shipment_order_goods'}),
-    path('shipment_order_goods_id/', views.shipment_orders, {'path': '/shipment_order_goods_id'}),
-    path('shipment_order_goods_all/', views.shipment_orders, {'path': '/shipment_order_goods_all'}),
+    path('update_shipment_orders/',             views.shipment_orders, {'path': '/update_shipment_orders'}),
+    path('insert_shipment_orders_by_order/',    views.shipment_orders, {'path': '/insert_shipment_orders_by_order'}),
+    path('shipment_order_goods/',               views.shipment_orders, {'path': '/shipment_order_goods'}),
+    path('shipment_order_goods_id/',            views.shipment_orders, {'path': '/shipment_order_goods_id'}),
+    path('shipment_order_goods_id_all/',            views.shipment_orders, {'path': '/shipment_order_goods_id_all'}),
+    path('shipment_order_goods_all/',           views.shipment_orders, {'path': '/shipment_order_goods_all'}),
 ]

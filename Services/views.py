@@ -1,7 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .classes import zone, color, rack, client, order, good_type, shipment_order, shipment_order_good, order_good
-from .converters import string_converter
+from .classes import zone, color, rack, client, order, good_type, shipment_order, \
+    shipment_order_good, order_good, categories, subcategories_2, subcategories_3, subcategories_4, shelf, \
+    shelf_space
+from .sub_classes import orders_requests
+from .converters import string_converter, json_converter
 
 from asgiref.sync import sync_to_async
 
@@ -9,22 +12,22 @@ from asgiref.sync import sync_to_async
 # Create your views here.
 
 def colors(request, *args):
-    result = color.Color().get_color()
+    result = json_converter.JsonConverter().convert(color.Color().get_color())
     return HttpResponse(string_converter.StringConverter().convert(result))
 
 
 def zones(request, *args):
-    result = zone.Zone().get_zone()
+    result = json_converter.JsonConverter().convert(zone.Zone().get_zone())
     return HttpResponse(string_converter.StringConverter().convert(result))
 
 
 def racks(request, path):
     result = ""
     if path == '/racks':
-        result = rack.Rack().getRack()
+        result = json_converter.JsonConverter().convert(rack.Rack().get_rack())
 
     if path == '/racks_by_zone':
-        result = rack.Rack().getRack(1)
+        result = json_converter.JsonConverter().convert(rack.Rack().get_rack(1))
 
     return HttpResponse(string_converter.StringConverter().convert(result))
 
@@ -32,7 +35,7 @@ def racks(request, path):
 def shelfs(request, path):
     result = ""
     if path == "/shelfs":
-        result = "getShelfs"
+        result = json_converter.JsonConverter().convert(json_converter.JsonConverter().convert(shelf.Shelf().get_shelfs()))
 
     if path == "/shelfs_by_racks":
         result = "getShipmentOrderGoods"
@@ -45,19 +48,27 @@ def shipment_orders(request, path):
     if path == "/shipment_order_goods":
         order_type = request.GET.get('type')
         status = request.GET.get('status')
-        result = shipment_order.ShipmentOrder().get_shipment_orders(order_type, status)
+        result = json_converter.JsonConverter().convert(orders_requests.Orders().get_shipment_orders(order_type, status))
 
     if path == "/shipment_order_goods_id":
         status = request.GET.get('status')
         order_id = request.GET.get('order_id')
-        result = shipment_order.ShipmentOrder().get_orders_with_fullness(order_id, status)
+        result = json_converter.JsonConverter().convert(orders_requests.Orders().get_orders_with_fullness(order_id, status))
 
     if path == "/shipment_order_goods_all":
-        result = "getShipmentOrderGoodsAll"
+        result = json_converter.JsonConverter().convert(shipment_order_good.ShipmentOrderGood().get_order_goods())
+
+    if path == "/shipment_order_goods_id_all":
+        order_id = request.GET.get('order_id')
+        result = json_converter.JsonConverter().convert(shipment_order.ShipmentOrder().get_orders(order_id))
 
     if path == "/update_shipment_orders":
         # TODO написать код
         result = "updateShipmentOrders"
+
+    if path == "/insert_shipment_orders_by_order":
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(orders_requests.Orders().update_shipment_orders(body))
 
     return HttpResponse(string_converter.StringConverter().convert(result))
 
@@ -66,21 +77,22 @@ def orders(request, path):
     result = ""
 
     if path == "/orders":
-        # TODO написать код
-        result = "getOrders"
+        order_status = request.GET.get('type')
+        status_execution = request.GET.get('status')
+        result = json_converter.JsonConverter().convert(order.Order().get_orders(status_execution, order_status))
 
     if path == "/orders_all":
         status = request.GET.get('status')
         print(status)
-        result = order.Order().get_orders(status)
+        result = json_converter.JsonConverter().convert(order.Order().get_orders(status))
 
     if path == "/orders_goods":
         order_id = request.GET.get('order_id')
-        result = order_good.OrderGoods().get_good_types_by_order(order_id)
+        result = json_converter.JsonConverter().convert(order_good.OrderGoods().get_good_types_by_order(order_id))
 
     if path == "/shipment_order_goods_by_order":
         code = request.GET.get("code")
-        result = shipment_order_good.ShipmentOrderGoods().get_ordered_goods(code)
+        result = json_converter.JsonConverter().convert(shipment_order_good.ShipmentOrderGood().get_ordered_goods(code))
 
     if path == "/update_order":
         result = "updateOrder"
@@ -89,14 +101,17 @@ def orders(request, path):
         result = "updateOrderGoods"
 
     if path == "/update_order_goods_expend":
-        result = "updateOrderGoodsExpend"
+        amount = request.GET.get('amount')
+        code = request.GET.get('code')
+        result = json_converter.JsonConverter().convert(orders_requests.update_order_goods_expend(code, amount))
 
     if path == "/update_order_status":
         id = request.GET.get("id")
-        result = order.Order().update_orders(id)
+        result = json_converter.JsonConverter().convert(order.Order().update_orders(id))
 
     if path == "/post_order":
-        result = "postNewOrder"
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(orders_requests.Orders().post_new_order_with_goods(body))
 
     return HttpResponse(string_converter.StringConverter().convert(result))
 
@@ -105,11 +120,11 @@ def clients(request, path):
     result = ""
 
     if path == "/clients":
-        result = client.Client().get_client()
+        result = json_converter.JsonConverter().convert(client.Client().get_client())
 
     if path == "/post_user":
         body = request.body.decode('UTF-8')
-        result = client.Client().update_client_datatable(body)
+        result = json_converter.JsonConverter().convert(client.Client().update_client_datatable(body))
 
     return HttpResponse(string_converter.StringConverter().convert(result))
 
@@ -121,10 +136,10 @@ def types(request, path):
         result = "getGoodsTypeByCode"
 
     if path == "/goods_type_cats":
-        result = good_type.GoodType().get_good_types_with_cats()
+        result = json_converter.JsonConverter().convert(good_type.GoodType().get_good_types_with_cats())
 
     if path == "/goods_type":
-        result = good_type.GoodType().get_good_types()
+        result = json_converter.JsonConverter().convert(good_type.GoodType().get_good_types())
 
     if path == "/update_inventory":
         result = "updateInventory"
@@ -136,33 +151,34 @@ def categories(request, path):
     result = ""
 
     if path == "/goods_cat":
-        result = "getCategories"
+        result = json_converter.JsonConverter().convert(categories.Categories().get_categories())
 
     if path == "/goods_subcat2":
-        result = "getSubCategories2"
+        result = json_converter.JsonConverter().convert(subcategories_2.Subcategories2().get_subcategories())
 
     if path == "/goods_subcat3":
-        result = "getSubCategories3"
+        result = json_converter.JsonConverter().convert(subcategories_3.Subcategories3().get_subcategories())
 
     if path == "/goods_subcat4":
-        result = "getSubCategories4"
+        result = json_converter.JsonConverter().convert(subcategories_4.Subcategories4().get_categories())
 
     return HttpResponse(string_converter.StringConverter().convert(result))
 
 
-def shelf_space(request, path):
+def shelf_spaces(request, path):
     result = ""
 
-    if path == "shelf_space":
-        result = "getShelfSpace"
+    if path == "/shelf_space":
+        result = json_converter.JsonConverter().convert(shelf_space.ShelfSpace().get_shelf_space())
 
-    if path == "shelf_set":
+    if path == "/shelf_set":
         result = "setShelfs"
 
-    if path == "post_goods_to_shelfs":
-        result = "postGoodsToShelfSpace"
+    if path == "/post_goods_to_shelfs":
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(orders_requests.Orders().post_goods_to_shelf_space(body) )
 
-    if path == "update_shelf_space_status":
+    if path == "/update_shelf_space_status":
         result = "updateShelfSpaceStatus"
 
     return HttpResponse(string_converter.StringConverter().convert(result))
