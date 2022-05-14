@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.http import HttpResponse
 from .classes import zone, color, rack, client, order, good_type, shipment_order, \
     shipment_order_good, order_good, categories, subcategories_2, subcategories_3, subcategories_4, shelf, \
@@ -6,8 +5,7 @@ from .classes import zone, color, rack, client, order, good_type, shipment_order
 from .sub_classes import orders_requests
 from .converters import string_converter, json_converter
 
-from asgiref.sync import sync_to_async
-
+from urllib.parse import unquote
 
 # Create your views here.
 
@@ -55,6 +53,11 @@ def shipment_orders(request, path):
         order_id = request.GET.get('order_id')
         result = json_converter.JsonConverter().convert(orders_requests.Orders().get_orders_with_fullness(order_id, status))
 
+    if path == "/shipment_goods_id":
+        shipment_num = request.GET.get('shipment_num')
+        shipment_num = unquote(shipment_num)
+        result = json_converter.JsonConverter().convert(orders_requests.Orders().get_shipment_order_goods(shipment_num))
+
     if path == "/shipment_order_goods_all":
         result = json_converter.JsonConverter().convert(shipment_order_good.ShipmentOrderGood().get_order_goods())
 
@@ -69,6 +72,10 @@ def shipment_orders(request, path):
     if path == "/insert_shipment_orders_by_order":
         body = request.body.decode('UTF-8')
         result = json_converter.JsonConverter().convert(orders_requests.Orders().update_shipment_orders(body))
+
+    if path == "/insert_shipment_goods":
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(orders_requests.Orders().post_shipment_goods(body))
 
     return HttpResponse(string_converter.StringConverter().convert(result))
 

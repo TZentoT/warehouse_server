@@ -10,12 +10,13 @@ class ShipmentOrderGood(models.Model):
             if code == -1:
                 cursor.execute(f"SELECT * FROM shipment_order_goods ORDER BY code ASC")
             if code != -1:
-                cursor.execute(f"SELECT goods, order_num FROM shipment_order_goods WHERE code={code}")
+                cursor.execute(f"SELECT * FROM shipment_order_goods WHERE order_num={code}")
             rows = cursor.fetchall()
             result = []
             keys = ('code', 'goods', 'amount', 'order_num', 'amount_real', 'placed_amount')
             for row in rows:
                 result.append(dict(zip(keys, row)))
+            print(f"get_order_goods res: {result}")
             data = result
         except Exception as e:
             print(f"getOrders went wrong: {e}")
@@ -62,32 +63,24 @@ class ShipmentOrderGood(models.Model):
                 cursor.execute(f"UPDATE shipment_order_goods SET placed_amount = placed_amount + 1 WHERE code={code}")
             if amount_real != -1 and code != -1 and amount == -1:
                 cursor.execute(f"UPDATE shipment_order_goods SET amount_real={amount_real} WHERE code={code}")
-            rows = cursor.fetchall()
-            result = []
-            keys = ('code', 'goods', 'amount', 'order_num', 'amount_real', 'placed_amount')
-            for row in rows:
-                result.append(dict(zip(keys, row)))
-            data = result
-            print(f'res {data}')
+
+            print(f'update_ordered_goods res {data}')
         except Exception as e:
             print(f"update_ordered_goods went wrong: {e}")
 
         return data
 
-    def insert_ordered_goods(self, code, goods, amount, order_num):
+    def insert_ordered_goods(self, code, goods, amount, order_num, amount_real, placed_amount):
         data = ""
+        print(f"new_id {code}")
         try:
             cursor = connection.cursor()
-            cursor.execute(f"INSERT INTO shipment_order_goods (code, goods, amount, order_num) "
-                           f"VALUES ({code}, {goods}, {amount}, {order_num})")
-            rows = cursor.fetchall()
-            result = []
-            keys = ('code', 'goods', 'amount', 'order_num', 'amount_real', 'placed_amount')
-            for row in rows:
-                result.append(dict(zip(keys, row)))
-            data = result
+            cursor.execute(f"INSERT INTO shipment_order_goods (code, goods, amount, order_num, "
+                           f"amount_real, placed_amount) "
+                           f"VALUES ({code}, {goods}, {amount}, {order_num}, {amount_real}, {placed_amount})")
+
             print(f'res {data}')
         except Exception as e:
-            print(f"update_ordered_goods went wrong: {e}")
+            print(f"insert_ordered_goods went wrong: {e}")
 
         return data

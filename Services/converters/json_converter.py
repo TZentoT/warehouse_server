@@ -7,7 +7,7 @@ class JsonConverter:
     def convert(self, obj):
         data = ""
         try:
-            data = str(obj)
+            data = obj
             data = simplejson.dumps(data,  indent=4, sort_keys=True, default=str)
             data = json.loads(data)
         except Exception as e:

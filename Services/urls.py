@@ -42,8 +42,10 @@ urlpatterns = [
 
     path('update_shipment_orders/',             views.shipment_orders, {'path': '/update_shipment_orders'}),
     path('insert_shipment_orders_by_order/',    views.shipment_orders, {'path': '/insert_shipment_orders_by_order'}),
+    path('insert_shipment_goods/',              views.shipment_orders, {'path': '/insert_shipment_goods'}),
     path('shipment_order_goods/',               views.shipment_orders, {'path': '/shipment_order_goods'}),
     path('shipment_order_goods_id/',            views.shipment_orders, {'path': '/shipment_order_goods_id'}),
-    path('shipment_order_goods_id_all/',            views.shipment_orders, {'path': '/shipment_order_goods_id_all'}),
+    path('shipment_goods_id/',                  views.shipment_orders, {'path': '/shipment_goods_id'}),
+    path('shipment_order_goods_id_all/',        views.shipment_orders, {'path': '/shipment_order_goods_id_all'}),
     path('shipment_order_goods_all/',           views.shipment_orders, {'path': '/shipment_order_goods_all'}),
 ]

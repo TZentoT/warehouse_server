@@ -5,11 +5,14 @@ from .categories import Categories
 
 class GoodType(models.Model):
 
-    def get_good_types(self):
+    def get_good_types(self, code=-1):
         data = ""
         try:
             cursor = connection.cursor()
-            cursor.execute(f"SELECT * FROM goods_type ORDER BY code ASC")
+            if code == -1:
+                cursor.execute(f"SELECT * FROM goods_type ORDER BY code ASC")
+            if code != -1:
+                cursor.execute(f"SELECT * FROM goods_type WHERE code={code}")
             rows = cursor.fetchall()
             result = []
             keys = ('code', 'name', 'article', 'category', 'subcategory_2', 'subcategory_3', 'subcategory_4',

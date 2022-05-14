@@ -12,7 +12,8 @@ from ..classes.zone import Zone
 from ..classes.shelf_space import ShelfSpace
 from ..classes.good_type import GoodType
 
-from ..converters import json_converter
+from ..converters import json_converter, string_converter
+
 
 class Orders(models.Model):
 
@@ -180,40 +181,82 @@ class Orders(models.Model):
         datatable = json.loads(datatable)
         datatable = json_converter.JsonConverter().convert(datatable)
 
-        shipment_orders_opened = ShipmentOrder().get_orders(datatable[0]['code'], "opened")
+        shipment_orders_opened = ShipmentOrder().get_orders(int(datatable[0]['orderCode']), "opened")
         shipment_orders = shipment_orders_opened
-        shipment_orders_closed = ShipmentOrder().get_orders(datatable[0]['code'], "closed")
+        shipment_orders_closed = ShipmentOrder().get_orders(int(datatable[0]['orderCode']), "closed")
         shipment_orders.__add__(shipment_orders_closed)
-        if len(shipment_orders) != 0:
-            shipment_orders = json.loads(shipment_orders)
-            shipment_orders = json_converter.JsonConverter().convert(shipment_orders)
 
-        new_id = ShipmentOrder().get_orders()[-1]['code']+1
+        shipment_orders_all = ShipmentOrder().get_orders()
+        new_id = json_converter.JsonConverter().convert(shipment_orders_all)[-1]['code']+1
         for data in datatable:
-            isNew = True
-            payment_status = 'Без доставки'
-            if int(data['shipmentCost']) != 0:
-                payment_status = 'Не оплачено'
+            if data['id'] != -1:
+                isNew = True
+                payment_status = 'Без доставки'
+                if int(data['shipmentCost']) != 0:
+                    payment_status = 'Не оплачено'
 
-            for shipment_order in shipment_orders:
-                if shipment_order['status'] != 'closed' and data['code'] == shipment_order['code']:
-                    isNew = False
-                    ShipmentOrder().update_orders(data['shipmentNumber'], data['shipmentDate'], payment_status,
-                                                  data['shipmentCost'], data['code'])
-                    shipment_orders.remove(shipment_order)
-            if isNew:
-                ShipmentOrder().insert_orders(new_id, data['shipmentNumber'], data['shipmentDate'], payment_status,
-                                              'Не доставлено', data['shipmentCost'], 'opened', data['code'])
-                new_id += 1
+                for shipment_order in shipment_orders:
+                    if shipment_order['status'] != 'closed' and data['orderCode'] == shipment_order['code']:
+                        isNew = False
+                        ShipmentOrder().update_orders(data['shipmentNumber'], data['shipmentDate'], payment_status,
+                                                      data['shipmentCost'], data['orderCode'])
+                        shipment_orders.remove(shipment_order)
+                if isNew:
+                    ShipmentOrder().insert_orders(new_id, data['shipmentNumber'], data['shipmentDate'], payment_status,
+                                                  'Не доставлено', data['shipmentCost'], 'opened', data['orderCode'])
+                    new_id += 1
 
         if len(shipment_orders) > 0:
             for shipment_order in shipment_orders:
                 if shipment_order['status'] != 'closed':
                     ShipmentOrder().delete_orders(shipment_order['code'])
 
-        return "update_shipment_orders complited"
+        return "update_shipment_orders completed"
+
+    def get_shipment_order_goods(self, shipment):
+        goods = []
+        shipment = ShipmentOrder().get_orders(0, '', shipment)
+        if shipment != []:
+            goods = ShipmentOrderGood().get_order_goods(shipment[0]['code'])
+            for good in goods:
+                goods_type = GoodType().get_good_types(good['goods'])
+                good['goods'] = goods_type[0]['name']
+                good['weight'] = goods_type[0]['weight']
+                good['order_code'] = goods_type[0]['code']
+
+        return goods
+
+    def post_shipment_goods(self, body):
+        self.data = []
+        datatable = body
+        datatable = json.loads(datatable)
+        datatable = json_converter.JsonConverter().convert(datatable)
+        shipment = ShipmentOrder().get_orders(0, '', datatable[0]['shipmentNumber'])
+        goods = ShipmentOrderGood().get_order_goods(shipment[0]['code'])
+
+        goods_all = json_converter.JsonConverter().convert(ShipmentOrderGood().get_order_goods())
+        new_id = int(goods_all[-1]['code'])
+
+        for data in datatable:
+            if datatable[0]['id'] != -1:
+                isNew = True
+                for good in goods:
+                    if data['code'] == good['code']:
+                        isNew = False
+                        ShipmentOrderGood().update_ordered_goods(data['expectingAmount'], -1, data['code'])
+                        goods.remove(good)
+                if isNew:
+                    new_id += 1
+                    ShipmentOrderGood().insert_ordered_goods(new_id, data['goodCode'], data['realAmount'],
+                                                             shipment[0]['code'], data['realAmount'],
+                                                             data['expectingAmount'])
+                    self.data.append(new_id)
 
 
+        for good in goods:
+            ShipmentOrderGood().delete_ordered_goods(good['code'])
+
+        return self.data
     # def sorter(self, array1, array2, op_type):
     #     if op_type == 'update':
     #         for elm1 in array1:
