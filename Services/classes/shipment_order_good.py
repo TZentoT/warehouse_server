@@ -57,7 +57,7 @@ class ShipmentOrderGood(models.Model):
         data = ""
         try:
             cursor = connection.cursor()
-            if amount != -1 and code != -1:
+            if amount != -1 and code != -1 and amount_real == -1:
                 cursor.execute(f"UPDATE shipment_order_goods SET amount={amount} WHERE code={code}")
             if amount == -1 and code != -1 and amount_real == -1:
                 cursor.execute(f"UPDATE shipment_order_goods SET placed_amount = placed_amount + 1 WHERE code={code}")

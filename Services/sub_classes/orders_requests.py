@@ -140,12 +140,20 @@ class Orders(models.Model):
 
     def post_goods_to_shelf_space(self, body):
         list_sorted = []
+        datatable = body
+        datatable = json.loads(datatable)
+        datatable = json_converter.JsonConverter().convert(datatable)
+
         shelfs = Shelf().get_shelfs()
         racks = Rack().get_rack()
         zones = Zone().get_zone()
+        print(f"datatable: {datatable}")
+        print(f"shelfs: {shelfs}")
+        print(f"racks: {racks}")
+        print(f"zones: {zones}")
 
-        for element in body:
-            if element['zone'] != "" & element['rack'] != " " & element['shelf'] != "  ":
+        for element in datatable:
+            if element['zone'] != "" and element['rack'] != " " and element['shelf'] != "  ":
                 list_sorted.append(element)
                 zone_ID = 0
                 rack_ID = 0
@@ -156,11 +164,11 @@ class Orders(models.Model):
                         zone_ID = zone['code']
 
                 for rack in racks:
-                    if rack['rack'] == element['rack'] & zone_ID == rack['zone_num']:
+                    if rack['name'] == element['rack'] and zone_ID == rack['zone_num']:
                         rack_ID = rack['code']
 
                 for shelf in shelfs:
-                    if shelf['name'] == element['shelf'] & rack_ID == shelf['rack_num']:
+                    if shelf['name'] == element['shelf'] and rack_ID == shelf['rack_num']:
                         shelf_ID = shelf['code']
 
                 ShelfSpace().insert(element['goodCode'], 1, shelf_ID)
@@ -177,6 +185,7 @@ class Orders(models.Model):
         return "update_order_goods_expend complited"
 
     def update_shipment_orders(self, body):
+        self.data = []
         datatable = body
         datatable = json.loads(datatable)
         datatable = json_converter.JsonConverter().convert(datatable)
@@ -184,10 +193,13 @@ class Orders(models.Model):
         shipment_orders_opened = ShipmentOrder().get_orders(int(datatable[0]['orderCode']), "opened")
         shipment_orders = shipment_orders_opened
         shipment_orders_closed = ShipmentOrder().get_orders(int(datatable[0]['orderCode']), "closed")
-        shipment_orders.__add__(shipment_orders_closed)
+        shipment_orders = shipment_orders_opened + shipment_orders_closed
+        print(f"shipment_orders {shipment_orders}")
+        print(f"shipment_orders_closed {shipment_orders_closed}")
+        print(f"data {datatable}")
 
         shipment_orders_all = ShipmentOrder().get_orders()
-        new_id = json_converter.JsonConverter().convert(shipment_orders_all)[-1]['code']+1
+        new_id = json_converter.JsonConverter().convert(shipment_orders_all)[-1]['code'] + 1
         for data in datatable:
             if data['id'] != -1:
                 isNew = True
@@ -196,7 +208,7 @@ class Orders(models.Model):
                     payment_status = 'Не оплачено'
 
                 for shipment_order in shipment_orders:
-                    if shipment_order['status'] != 'closed' and data['orderCode'] == shipment_order['code']:
+                    if data['code'] == shipment_order['code']:
                         isNew = False
                         ShipmentOrder().update_orders(data['shipmentNumber'], data['shipmentDate'], payment_status,
                                                       data['shipmentCost'], data['orderCode'])
@@ -204,6 +216,7 @@ class Orders(models.Model):
                 if isNew:
                     ShipmentOrder().insert_orders(new_id, data['shipmentNumber'], data['shipmentDate'], payment_status,
                                                   'Не доставлено', data['shipmentCost'], 'opened', data['orderCode'])
+                    self.data.append(new_id)
                     new_id += 1
 
         if len(shipment_orders) > 0:
@@ -211,7 +224,7 @@ class Orders(models.Model):
                 if shipment_order['status'] != 'closed':
                     ShipmentOrder().delete_orders(shipment_order['code'])
 
-        return "update_shipment_orders completed"
+        return self.data
 
     def get_shipment_order_goods(self, shipment):
         goods = []
@@ -252,11 +265,41 @@ class Orders(models.Model):
                                                              data['expectingAmount'])
                     self.data.append(new_id)
 
-
         for good in goods:
             ShipmentOrderGood().delete_ordered_goods(good['code'])
 
         return self.data
+
+    def update_deliveries(self, body):
+        datatable = body
+        datatable = json.loads(datatable)
+        datatable = json_converter.JsonConverter().convert(datatable)
+
+        for data in datatable:
+            ShipmentOrderGood().update_ordered_goods(-1, data['amount'], data['code'])
+
+        ShipmentOrder().update_orders("", "", "", "", datatable[0]['orderCode'])
+
+        print(f"update_deliveries {body}")
+
+        return "update_shipment_orders completed"
+
+    def update_shelves_space(self, body):
+        self.data = []
+        datatable = body
+        datatable = json.loads(datatable)
+        datatable = json_converter.JsonConverter().convert(datatable)
+
+        zones = Zone().get_zone(datatable[0]['zone'])
+        racks = Rack().get_rack(datatable[0]['rack'], zones[0]['code'])
+        shelves = Shelf().get_shelfs(datatable[0]['shelf'], racks[0]['code'])
+
+        for data in datatable:
+            self.data.append(data['inventaryzationStatus'])
+            ShelfSpace().update(shelves[0]['code'], data['shelfSpaceCode'], data['inventaryzationStatus'])
+
+        return self.data
+
     # def sorter(self, array1, array2, op_type):
     #     if op_type == 'update':
     #         for elm1 in array1:

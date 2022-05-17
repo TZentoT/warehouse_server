@@ -33,12 +33,14 @@ class ShelfSpace(models.Model):
 
         return data
 
-    def update(self, shelf_num, code):
+    def update(self, shelf_num=0, code=0, status=""):
         data = ""
         try:
             cursor = connection.cursor()
-            cursor.execute(f"UPDATE shelf_space SET shelf_num={shelf_num} WHERE code={code}")
-
+            if shelf_num != 0 and code != 0 and status == "":
+                cursor.execute(f"UPDATE shelf_space SET shelf_num={shelf_num} WHERE code={code}")
+            if shelf_num != 0 and code != 0 and status != "":
+                cursor.execute(f"UPDATE shelf_space SET status='{status}' WHERE shelf_num={shelf_num} and code={code}")
         except Exception as e:
             print(f"Smth wrong: {e}")
 

@@ -105,7 +105,8 @@ def orders(request, path):
         result = "updateOrder"
 
     if path == "/update_order_goods":
-        result = "updateOrderGoods"
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(orders_requests.Orders().update_deliveries(body))
 
     if path == "/update_order_goods_expend":
         amount = request.GET.get('amount')
@@ -186,7 +187,8 @@ def shelf_spaces(request, path):
         result = json_converter.JsonConverter().convert(orders_requests.Orders().post_goods_to_shelf_space(body) )
 
     if path == "/update_shelf_space_status":
-        result = "updateShelfSpaceStatus"
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(orders_requests.Orders().update_shelves_space(body))
 
     return HttpResponse(string_converter.StringConverter().convert(result))
 
