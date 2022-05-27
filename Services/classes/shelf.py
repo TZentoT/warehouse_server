@@ -13,7 +13,7 @@ class Shelf(models.Model):
                 cursor.execute(f"SELECT * FROM shelfs WHERE name LIKE '{name}' and rack_num={rack_num}")
             rows = cursor.fetchall()
             result = []
-            keys = ('code', 'name', 'shelf_num', 'rack_num', 'capacity', 'shelf_space')
+            keys = ('code', 'name', 'shelf_num', 'rack_num', 'capacity', 'shelf_space', 'row', 'column')
             for row in rows:
                 result.append(dict(zip(keys, row)))
             print(f'res {result}')

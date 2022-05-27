@@ -11,12 +11,13 @@ class Zone(models.Model):
         try:
             cursor = connection.cursor()
             if name == "":
-                cursor.execute('SELECT code, name FROM zones ORDER BY code ASC')
+                cursor.execute('SELECT * FROM zones ORDER BY code ASC')
             if name != "":
-                cursor.execute(f"SELECT code, name FROM zones WHERE name LIKE '{name}'")
+                cursor.execute(f"SELECT * FROM zones WHERE name LIKE '{name}'")
             rows = cursor.fetchall()
             result = []
-            keys = ('code', 'name')
+            keys = ('code', 'name', 'zone_num', 'width', 'length', 'color', 'line_width', 'chamfer_length', 'text_size',
+                    'message_alighment')
             for row in rows:
                 result.append(dict(zip(keys, row)))
             print(f'res {result}')

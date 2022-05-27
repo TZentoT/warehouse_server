@@ -1,4 +1,3 @@
-
 from ..converters import json_converter
 from django.db import models, connection
 

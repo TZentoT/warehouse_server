@@ -6,7 +6,7 @@ from ..converters.datetime_converter import DatetimeConverter
 
 class ShipmentOrder(models.Model):
 
-    def get_orders(self, order=0, status='', name=""):
+    def get_orders(self, order=0, status='', name="", code=-1):
         data = ""
 
         try:
@@ -14,14 +14,16 @@ class ShipmentOrder(models.Model):
             if order != 0 and status != '' and name == "":
                 cursor.execute(f"SELECT * FROM shipment_order WHERE order_id={order} AND status "
                            f"LIKE '{status}' ORDER BY code ASC")
-            if order != 0 and status == '' and name == "":
+            if order != 0 and status == '' and name == "" and code == -1:
                 cursor.execute(f"SELECT * FROM shipment_order WHERE order_id={order} ORDER BY code ASC")
-            if order == 0 and status == '' and name == "":
+            if order == 0 and status == '' and name == "" and code == -1:
                 cursor.execute(f"SELECT * FROM shipment_order ORDER BY code ASC")
-            if order == 0 and status != '' and name == "":
+            if order == 0 and status != '' and name == "" and code == -1:
                 cursor.execute(f"SELECT * FROM shipment_order WHERE status LIKE '{status}%' ORDER BY code ASC")
-            if order == 0 and status == '' and name != "":
+            if order == 0 and status == '' and name != "" and code == -1:
                 cursor.execute(f"SELECT * FROM shipment_order WHERE name LIKE '{name}'")
+            if order == 0 and status == '' and name == "" and code != -1:
+                cursor.execute(f"SELECT * FROM shipment_order WHERE code={code}")
             rows = cursor.fetchall()
             result = []
             keys = ('code', 'name', 'shipment_date', 'shipment_status', 'shipment_payment', 'note', 'shipment_price',
@@ -38,10 +40,11 @@ class ShipmentOrder(models.Model):
     def update_orders(self, name="", shipment_date="", shipment_payment="", shipment_price="", code=-1):
         data = ""
         try:
+            print(shipment_price)
             cursor = connection.cursor()
             if name != "" and shipment_date != "" and shipment_payment != "" and shipment_price != "" and code != -1:
                 cursor.execute(f"UPDATE shipment_order SET name='{name}', shipment_date='{shipment_date}', "
-                           f"shipment_payment='{shipment_payment}', shipment_price='{shipment_price}' "
+                           f"shipment_payment='{shipment_payment}', shipment_price={shipment_price} "
                                f"WHERE code={code}")
             if name == "" and shipment_date == "" and shipment_payment == "" and shipment_price == "" and code != -1:
                 cursor.execute(f"UPDATE shipment_order SET status='closed' WHERE code={code}")

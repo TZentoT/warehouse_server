@@ -1,3 +1,4 @@
+import base64
 import json
 
 from django.db import models, connection
@@ -11,6 +12,7 @@ from ..classes.rack import Rack
 from ..classes.zone import Zone
 from ..classes.shelf_space import ShelfSpace
 from ..classes.good_type import GoodType
+from ..classes.invoice import Invoice
 
 from ..converters import json_converter, string_converter
 
@@ -193,31 +195,31 @@ class Orders(models.Model):
         shipment_orders_opened = ShipmentOrder().get_orders(int(datatable[0]['orderCode']), "opened")
         shipment_orders = shipment_orders_opened
         shipment_orders_closed = ShipmentOrder().get_orders(int(datatable[0]['orderCode']), "closed")
-        shipment_orders = shipment_orders_opened + shipment_orders_closed
         print(f"shipment_orders {shipment_orders}")
         print(f"shipment_orders_closed {shipment_orders_closed}")
         print(f"data {datatable}")
+        shipment_orders = shipment_orders_opened + shipment_orders_closed
 
         shipment_orders_all = ShipmentOrder().get_orders()
         new_id = json_converter.JsonConverter().convert(shipment_orders_all)[-1]['code'] + 1
         for data in datatable:
-            if data['id'] != -1:
-                isNew = True
-                payment_status = 'Без доставки'
+            isNew = True
+            payment_status = 'Без доставки'
+            if data['code'] != 0:
                 if int(data['shipmentCost']) != 0:
                     payment_status = 'Не оплачено'
-
                 for shipment_order in shipment_orders:
                     if data['code'] == shipment_order['code']:
+                        print(data)
                         isNew = False
                         ShipmentOrder().update_orders(data['shipmentNumber'], data['shipmentDate'], payment_status,
-                                                      data['shipmentCost'], data['orderCode'])
+                                                      data['shipmentCost'], data['code'])
                         shipment_orders.remove(shipment_order)
-                if isNew:
-                    ShipmentOrder().insert_orders(new_id, data['shipmentNumber'], data['shipmentDate'], payment_status,
-                                                  'Не доставлено', data['shipmentCost'], 'opened', data['orderCode'])
-                    self.data.append(new_id)
-                    new_id += 1
+            if isNew:
+                ShipmentOrder().insert_orders(new_id, data['shipmentNumber'], data['shipmentDate'], payment_status,
+                                              'Не доставлено', data['shipmentCost'], 'opened', data['orderCode'])
+                self.data.append(new_id)
+                new_id += 1
 
         if len(shipment_orders) > 0:
             for shipment_order in shipment_orders:
@@ -228,7 +230,7 @@ class Orders(models.Model):
 
     def get_shipment_order_goods(self, shipment):
         goods = []
-        shipment = ShipmentOrder().get_orders(0, '', shipment)
+        shipment = ShipmentOrder().get_orders(0, '', "", shipment)
         if shipment != []:
             goods = ShipmentOrderGood().get_order_goods(shipment[0]['code'])
             for good in goods:
@@ -244,7 +246,7 @@ class Orders(models.Model):
         datatable = body
         datatable = json.loads(datatable)
         datatable = json_converter.JsonConverter().convert(datatable)
-        shipment = ShipmentOrder().get_orders(0, '', datatable[0]['shipmentNumber'])
+        shipment = ShipmentOrder().get_orders(0, '', "", datatable[0]['shipmentNumber'])
         goods = ShipmentOrderGood().get_order_goods(shipment[0]['code'])
 
         goods_all = json_converter.JsonConverter().convert(ShipmentOrderGood().get_order_goods())
@@ -275,12 +277,27 @@ class Orders(models.Model):
         datatable = json.loads(datatable)
         datatable = json_converter.JsonConverter().convert(datatable)
 
+        # print(f"datable {datatable}")
+        # print(f"datable {datatable[0]['doc']}")
+
         for data in datatable:
             ShipmentOrderGood().update_ordered_goods(-1, data['amount'], data['code'])
 
         ShipmentOrder().update_orders("", "", "", "", datatable[0]['orderCode'])
 
-        print(f"update_deliveries {body}")
+        status = ""
+        if datatable[0]['type'] == "Приход":
+            status = 'Принято'
+        else:
+            status = 'Отправлено'
+        order_id = ShipmentOrder().get_orders(0, '', "", int(datatable[0]['orderCode']))[0]['order_id']
+        # doc = base64.b64 decode(datatable[0]['doc'])
+        # print(doc)
+
+        Invoice().insert(int(datatable[0]['account']), order_id, datatable[0]['date'],
+                        status, datatable[0]['type'], 1, datatable[0]['orderCode'], datatable[0]['doc'])
+
+        # print(f"update_deliveries {body}")
 
         return "update_shipment_orders completed"
 
