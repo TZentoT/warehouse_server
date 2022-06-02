@@ -321,7 +321,7 @@ class Orders(models.Model):
         return self.data
 
     def get_virtual_rack_with_shelves(self):
-        self.data = []
+        data = {}
         racks = RackVirtual.get()
         shelves = ShelfVirtual.get()
 
@@ -329,8 +329,12 @@ class Orders(models.Model):
             rack['shelves'] = []
             for rack in racks:
                 if shelf['rack_id'] == rack['code']:
-                    rack['shelves'].__add__(shelf)
-                    # def sorter(self, array1, array2, op_type):
+                    rack['shelves'][f"shelf_{shelf['code']}"] = shelf
+
+        print()
+        return self.data
+
+    # def sorter(self, array1, array2, op_type):
     #     if op_type == 'update':
     #         for elm1 in array1:
     #             for elm2 in array2:

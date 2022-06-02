@@ -6,10 +6,10 @@ urlpatterns = [
 
     path('zones/', views.zones),
 
-    path('zones_virtual/',          views.zone_virtual, {'path': '/zones_virtual'}),
-    path('zones_virtual_post/',     views.zone_virtual, {'path': '/zones_virtual_post'}),
-    path('zones_virtual_update/',   views.zone_virtual, {'path': '/zones_virtual_update'}),
-    path('zones_virtual_delete/',   views.zone_virtual, {'path': '/zones_virtual_delete'}),
+    path('zones_virtual/',          views.zones_virtual, {'path': '/zones_virtual'}),
+    path('zones_virtual_post/',     views.zones_virtual, {'path': '/zones_virtual_post'}),
+    path('zones_virtual_update/',   views.zones_virtual, {'path': '/zones_virtual_update'}),
+    path('zones_virtual_delete/',   views.zones_virtual, {'path': '/zones_virtual_delete'}),
 
     path('racks/',          views.racks, {'path': '/racks'}),
     path('racks_by_zone/',  views.racks, {'path': '/racks_by_zone'}),
