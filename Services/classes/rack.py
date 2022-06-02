@@ -16,8 +16,7 @@ class Rack(models.Model):
                 cursor.execute(f"SELECT * FROM racks WHERE name LIKE '{name}' and zone_num={zone_num} ")
             rows = cursor.fetchall()
             result = []
-            keys = ('code', 'name', 'rack_num', 'zone_num', 'depth', 'shelf_width', 'shelf_height', 'columns_amount',
-                    "rows_amount", 'border_width', 'color', 'translation')
+            keys = ('code', 'name', 'rack_num', 'zone_num', 'center_point', 'rotation', 'rack_type_id', 'type')
             for row in rows:
                 result.append(dict(zip(keys, row)))
             print(f'res {result}')

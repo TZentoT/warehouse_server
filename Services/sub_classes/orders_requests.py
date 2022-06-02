@@ -13,6 +13,9 @@ from ..classes.zone import Zone
 from ..classes.shelf_space import ShelfSpace
 from ..classes.good_type import GoodType
 from ..classes.invoice import Invoice
+from ..classes.shelf_virtual import ShelfVirtual
+from ..classes.rack_virtual import RackVirtual
+from ..classes.zone_virtual import ZoneVirtual
 
 from ..converters import json_converter, string_converter
 
@@ -317,7 +320,17 @@ class Orders(models.Model):
 
         return self.data
 
-    # def sorter(self, array1, array2, op_type):
+    def get_virtual_rack_with_shelves(self):
+        self.data = []
+        racks = RackVirtual.get()
+        shelves = ShelfVirtual.get()
+
+        for shelf in shelves:
+            rack['shelves'] = []
+            for rack in racks:
+                if shelf['rack_id'] == rack['code']:
+                    rack['shelves'].__add__(shelf)
+                    # def sorter(self, array1, array2, op_type):
     #     if op_type == 'update':
     #         for elm1 in array1:
     #             for elm2 in array2:

@@ -6,11 +6,26 @@ urlpatterns = [
 
     path('zones/', views.zones),
 
+    path('zones_virtual/',          views.zone_virtual, {'path': '/zones_virtual'}),
+    path('zones_virtual_post/',     views.zone_virtual, {'path': '/zones_virtual_post'}),
+    path('zones_virtual_update/',   views.zone_virtual, {'path': '/zones_virtual_update'}),
+    path('zones_virtual_delete/',   views.zone_virtual, {'path': '/zones_virtual_delete'}),
+
     path('racks/',          views.racks, {'path': '/racks'}),
     path('racks_by_zone/',  views.racks, {'path': '/racks_by_zone'}),
 
-    path('shelfs/', views.shelfs, {'path': '/shelfs'}),
+    path('racks_virtual/',          views.racks_virtual, {'path': '/racks_virtual'}),
+    path('racks_virtual_post/',     views.racks_virtual, {'path': '/racks_virtual_post'}),
+    path('racks_virtual_update/',   views.racks_virtual, {'path': '/racks_virtual_update'}),
+    path('racks_virtual_delete/',   views.racks_virtual, {'path': '/racks_virtual_delete'}),
+
+    path('shelfs/',          views.shelfs, {'path': '/shelfs'}),
     path('shelfs_by_racks/', views.shelfs, {'path': '/shelfs_by_racks'}),
+
+    path('shelfs_virtual/',          views.shelfs_virtual, {'path': '/shelfs_virtual'}),
+    path('shelfs_virtual_insert/',   views.shelfs_virtual, {'path': '/shelfs_virtual_insert'}),
+    path('shelfs_virtual_update/',   views.shelfs_virtual, {'path': '/shelfs_virtual_update'}),
+    path('shelfs_virtual_delete/',   views.shelfs_virtual, {'path': '/shelfs_virtual_delete'}),
 
     path('goods_type_code/',    views.types, {'path': '/goods_type_code'}),
     path('goods_type_cats/',    views.types, {'path': '/goods_type_cats'}),

@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from .classes import zone, color, rack, client, order, good_type, shipment_order, \
     shipment_order_good, order_good, categories, subcategories_2, subcategories_3, subcategories_4, shelf, \
-    shelf_space
+    shelf_space, rack_virtual, zone_virtual, shelf_virtual
 from .sub_classes import orders_requests
 from .converters import string_converter, json_converter
 
@@ -19,6 +19,25 @@ def zones(request, *args):
     return HttpResponse(string_converter.StringConverter().convert(result))
 
 
+def zones_virtual(request, path):
+    result = ""
+    if path == '/zones_virtual':
+        result = json_converter.JsonConverter().convert(zone_virtual.ZoneVirtual().get())
+
+    if path == '/zones_virtual_post':
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(zone_virtual.ZoneVirtual().insert(body))
+
+    if path == '/zones_virtual_update':
+        result = json_converter.JsonConverter().convert(zone_virtual.ZoneVirtual().get())
+
+    if path == '/zones_virtual_delete':
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(zone_virtual.ZoneVirtual().insert(body))
+
+    return HttpResponse(string_converter.StringConverter().convert(result))
+
+
 def racks(request, path):
     result = ""
     if path == '/racks':
@@ -30,6 +49,30 @@ def racks(request, path):
     return HttpResponse(string_converter.StringConverter().convert(result))
 
 
+def racks_virtual(request, path):
+    result = ""
+    if path == '/racks_virtual':
+        result = json_converter.JsonConverter().convert(rack_virtual.RackVirtual().get())
+
+    if path == '/racks_virtual_shelves':
+        result = json_converter.JsonConverter().convert(rack_virtual.RackVirtual().get())
+
+    if path == '/racks_virtual_post':
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(rack_virtual.RackVirtual().insert(body))
+
+    if path == '/racks_virtual_update':
+        body = request.body.decode('UTF-8')
+        id = body['code']
+        result = json_converter.JsonConverter().convert(rack_virtual.RackVirtual().update(id, body))
+
+    if path == '/racks_virtual_delete':
+        id = request.body.decode('UTF-8')['id']
+        result = json_converter.JsonConverter().convert(rack_virtual.RackVirtual().delete(id))
+
+    return HttpResponse(string_converter.StringConverter().convert(result))
+
+
 def shelfs(request, path):
     result = ""
     if path == "/shelfs":
@@ -37,6 +80,31 @@ def shelfs(request, path):
 
     if path == "/shelfs_by_racks":
         result = "getShipmentOrderGoods"
+
+    return HttpResponse(string_converter.StringConverter().convert(result))
+
+
+def shelfs_virtual(request, path):
+    result = ""
+    if path == "/shelfs_virtual":
+        result = json_converter.JsonConverter().convert(
+            json_converter.JsonConverter().convert(shelf_virtual.ShelfVirtual.get()))
+
+    if path == "/shelfs_virtual_insert":
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(
+            json_converter.JsonConverter().convert(shelf_virtual.ShelfVirtual.insert(body)))
+
+    if path == "/shelfs_virtual_update":
+        body = request.body.decode('UTF-8')
+        id = body['code']
+        result = json_converter.JsonConverter().convert(
+            json_converter.JsonConverter().convert(shelf_virtual.ShelfVirtual.update(id, body)))
+
+    if path == "/shelfs_virtual_delete":
+        id = body['id']
+        result = json_converter.JsonConverter().convert(
+            json_converter.JsonConverter().convert(shelf_virtual.ShelfVirtual.delete(id)))
 
     return HttpResponse(string_converter.StringConverter().convert(result))
 

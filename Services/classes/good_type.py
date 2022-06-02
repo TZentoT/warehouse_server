@@ -1,6 +1,7 @@
 
 from django.db import models, connection
 from .subcategories_2 import Subcategories2
+from .subcategories_3 import Subcategories3
 from .categories import Categories
 
 class GoodType(models.Model):
@@ -32,16 +33,16 @@ class GoodType(models.Model):
         data = ""
         try:
             goods = self.get_good_types()
-            subcategories = Subcategories2().get_subcategories()
+            subcategories = Subcategories3().get_subcategories()
             categories = Categories().get_categories()
 
             for element in goods:
                 for category in categories:
-                    if category['code'] == element['category']:
-                        element['category'] = category['name']
+                    if category['code'] == element['category_2']:
+                        element['subcategory_2'] = category['name']
                 for subcategory in subcategories:
-                    if subcategory['code'] == element['subcategory_2']:
-                        element['subcategory_2'] = subcategory['name']
+                    if subcategory['code'] == element['subcategory_3']:
+                        element['subcategory_3'] = subcategory['name']
             data = goods
             print(f'res {data}')
         except Exception as e:
