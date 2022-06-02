@@ -331,8 +331,9 @@ class Orders(models.Model):
                 if shelf['rack_id'] == rack['code']:
                     rack['shelves'][f"shelf_{shelf['code']}"] = shelf
 
-        print()
-        return self.data
+        data = racks
+        print(f"get_virtual_rack_with_shelves res {data}")
+        return data
 
     # def sorter(self, array1, array2, op_type):
     #     if op_type == 'update':
