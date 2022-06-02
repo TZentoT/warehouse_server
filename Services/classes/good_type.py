@@ -34,7 +34,7 @@ class GoodType(models.Model):
         try:
             goods = self.get_good_types()
             subcategories = Subcategories3().get_subcategories()
-            categories = Subcategories2().get_categories()
+            categories = Subcategories2().get_subcategories()
 
             for element in goods:
                 for category in categories:
