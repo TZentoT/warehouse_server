@@ -38,7 +38,7 @@ class GoodType(models.Model):
 
             for element in goods:
                 for category in categories:
-                    if category['code'] == element['category_2']:
+                    if category['code'] == element['subcategory_2']:
                         element['subcategory_2'] = category['name']
                 for subcategory in subcategories:
                     if subcategory['code'] == element['subcategory_3']:
