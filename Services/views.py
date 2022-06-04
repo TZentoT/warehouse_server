@@ -55,7 +55,7 @@ def racks_virtual(request, path):
         result = json_converter.JsonConverter().convert(rack_virtual.RackVirtual().get())
 
     if path == '/racks_virtual_shelves':
-        result = json_converter.JsonConverter().convert(orders_requests.Orders.get_virtual_rack_with_shelves())
+        result = json_converter.JsonConverter().convert(orders_requests.Orders().get_virtual_rack_with_shelves())
 
     if path == '/racks_virtual_post':
         body = request.body.decode('UTF-8')

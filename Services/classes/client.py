@@ -14,7 +14,7 @@ class Client(models.Model):
             cursor.execute('SELECT * FROM accounts ORDER BY code ASC')
             rows = cursor.fetchall()
             result = []
-            keys = ("code", "name", "surname", "patronymic", "avatar", "login", "password", "phone_num", "duty")
+            keys = ("code", "name", "surname", "patronymic", "login", "password", "phone_num", "duty", "avatar")
             for row in rows:
                 result.append(dict(zip(keys, row)))
             data = result

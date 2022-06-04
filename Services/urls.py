@@ -6,15 +6,16 @@ urlpatterns = [
 
     path('zones/', views.zones),
 
-    path('zones_virtual/',          views.zones_virtual, {'path': '/zones_virtual'}),
-    path('zones_virtual_post/',     views.zones_virtual, {'path': '/zones_virtual_post'}),
-    path('zones_virtual_update/',   views.zones_virtual, {'path': '/zones_virtual_update'}),
-    path('zones_virtual_delete/',   views.zones_virtual, {'path': '/zones_virtual_delete'}),
+    path('zones_virtual/',                  views.zones_virtual, {'path': '/zones_virtual'}),
+    path('zones_virtual_post/',             views.zones_virtual, {'path': '/zones_virtual_post'}),
+    path('zones_virtual_update/',           views.zones_virtual, {'path': '/zones_virtual_update'}),
+    path('zones_virtual_delete/',           views.zones_virtual, {'path': '/zones_virtual_delete'}),
 
     path('racks/',          views.racks, {'path': '/racks'}),
     path('racks_by_zone/',  views.racks, {'path': '/racks_by_zone'}),
 
     path('racks_virtual/',          views.racks_virtual, {'path': '/racks_virtual'}),
+    path('racks_virtual_shelves/',  views.racks_virtual, {'path': '/racks_virtual_shelves'}),
     path('racks_virtual_post/',     views.racks_virtual, {'path': '/racks_virtual_post'}),
     path('racks_virtual_update/',   views.racks_virtual, {'path': '/racks_virtual_update'}),
     path('racks_virtual_delete/',   views.racks_virtual, {'path': '/racks_virtual_delete'}),

@@ -322,15 +322,15 @@ class Orders(models.Model):
 
     def get_virtual_rack_with_shelves(self):
         data = {}
-        racks = RackVirtual.get()
-        shelves = ShelfVirtual.get()
+        racks = RackVirtual().get()
+        shelves = ShelfVirtual().get()
 
-        for shelf in shelves:
-            rack['shelves'] = []
-            for rack in racks:
+        for rack in racks:
+            shelves_dump = []
+            for shelf in shelves:
                 if shelf['rack_id'] == rack['code']:
-                    rack['shelves'][f"shelf_{shelf['code']}"] = shelf
-
+                    shelves_dump.append(shelf)
+            rack['shelves'] = shelves_dump
         data = racks
         print(f"get_virtual_rack_with_shelves res {data}")
         return data
