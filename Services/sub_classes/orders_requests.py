@@ -30,7 +30,9 @@ class Orders(models.Model):
         array_for_delete = []
 
         array_id = ShipmentOrder().get_orders()
-        new_id = array_id[len(array_id) - 1]['code']
+        new_id = 1
+        if len(array_id) != 0:
+            new_id = array_id[len(array_id) - 1]['code']
         iterator = 1
 
         for shipment in body['tablelist']:
@@ -129,13 +131,18 @@ class Orders(models.Model):
         else:
             datatable[0]['order_status'] = 'purchase'
 
+        new_id = 1
         array = Order().get_orders()
-        new_id = array[-1]['id'] + 1
+        if len(array) != 0:
+            new_id = array[-1]['id'] + 1
+
         Order().insert_order(new_id, datatable[0]['cost'], datatable[0]['deadline'], datatable[0]['order_status'],
                              datatable[0]['address'], datatable[0]['note'], datatable[0]['name'])
+        new_good_id = 1
         array = OrderGoods().get_order_goods()
+        if len(array) != 0:
+            new_good_id = array[-1]['id']
 
-        new_good_id = array[-1]['id']
         for good in datatable[0]['order_goods']:
             new_good_id += 1
             print(good)
@@ -196,19 +203,21 @@ class Orders(models.Model):
         datatable = json_converter.JsonConverter().convert(datatable)
 
         shipment_orders_opened = ShipmentOrder().get_orders(int(datatable[0]['orderCode']), "opened")
-        shipment_orders = shipment_orders_opened
         shipment_orders_closed = ShipmentOrder().get_orders(int(datatable[0]['orderCode']), "closed")
-        print(f"shipment_orders {shipment_orders}")
+        print(f"shipment_orders {shipment_orders_opened}")
         print(f"shipment_orders_closed {shipment_orders_closed}")
         print(f"data {datatable}")
         shipment_orders = shipment_orders_opened + shipment_orders_closed
 
         shipment_orders_all = ShipmentOrder().get_orders()
-        new_id = json_converter.JsonConverter().convert(shipment_orders_all)[-1]['code'] + 1
+        new_id = 1
+        if len(json_converter.JsonConverter().convert(shipment_orders_all)) != 0:
+            new_id = json_converter.JsonConverter().convert(shipment_orders_all)[-1]['code'] + 1
+
         for data in datatable:
             isNew = True
             payment_status = 'Без доставки'
-            if data['code'] != 0:
+            if data['id'] != -1:
                 if int(data['shipmentCost']) != 0:
                     payment_status = 'Не оплачено'
                 for shipment_order in shipment_orders:
@@ -218,11 +227,11 @@ class Orders(models.Model):
                         ShipmentOrder().update_orders(data['shipmentNumber'], data['shipmentDate'], payment_status,
                                                       data['shipmentCost'], data['code'])
                         shipment_orders.remove(shipment_order)
-            if isNew:
-                ShipmentOrder().insert_orders(new_id, data['shipmentNumber'], data['shipmentDate'], payment_status,
-                                              'Не доставлено', data['shipmentCost'], 'opened', data['orderCode'])
-                self.data.append(new_id)
-                new_id += 1
+                if isNew and data['shipmentNumber'] != '-':
+                    ShipmentOrder().insert_orders(new_id, data['shipmentNumber'], data['shipmentDate'], payment_status,
+                                                  'Не доставлено', data['shipmentCost'], 'opened', data['orderCode'])
+                    self.data.append(new_id)
+                    new_id += 1
 
         if len(shipment_orders) > 0:
             for shipment_order in shipment_orders:
@@ -253,7 +262,9 @@ class Orders(models.Model):
         goods = ShipmentOrderGood().get_order_goods(shipment[0]['code'])
 
         goods_all = json_converter.JsonConverter().convert(ShipmentOrderGood().get_order_goods())
-        new_id = int(goods_all[-1]['code'])
+        new_id = 1
+        if len(goods_all) != 0:
+            new_id = int(goods_all[-1]['code'])
 
         for data in datatable:
             if datatable[0]['id'] != -1:
@@ -326,19 +337,51 @@ class Orders(models.Model):
         shelves = ShelfVirtual().get()
 
         for rack in racks:
-            shelves_dump = []
+            shelves_dump = {}
+            pos = 0
             for shelf in shelves:
                 if shelf['rack_id'] == rack['code']:
-                    shelves_dump.append(shelf)
+                    pos += 1
+                    shelves_dump[f"shelf_{pos}"] = {}
+                    shelves_dump[f"shelf_{pos}"] = shelf
+                    # shelves_dump.append(shelf)
             rack['shelves'] = shelves_dump
         data = racks
         print(f"get_virtual_rack_with_shelves res {data}")
         return data
 
-    # def sorter(self, array1, array2, op_type):
-    #     if op_type == 'update':
-    #         for elm1 in array1:
-    #             for elm2 in array2:
-    #                 if
-    #     if op_type == 'delete':
-    #     if op_type == 'insert':
+    def get_warehouse_model(self):
+        zones = Zone().get_zone()
+        for zone in zones:
+            racks = Rack().get_rack("", zone['code'])
+            zone_buf = []
+            for rack in racks:
+                shelves = Shelf().get_shelfs("", rack['code'])
+                shelf_buf = []
+                for shelf in shelves:
+                    goods_stored = ShelfSpace().get_shelf_space(shelf['code'])
+                    good_with_all_info = []
+                    for good in goods_stored:
+                        good_with_all_info.append(self.get_good_stored_with_all_info(good))
+                    shelf['space'] = good_with_all_info
+                    shelf_buf.append(shelf)
+
+                rack['shelfs'] = shelf_buf
+                zone_buf.append(rack)
+            zone['racks'] = zone_buf
+
+        return zones
+
+    def get_good_stored_with_all_info(self, good):
+        goods_type = GoodType().get_good_types_with_cats()
+
+        for good_type in goods_type:
+            if good_type['code'] == good['good']:
+                good['name'] = good_type['name']
+                good['category'] = good_type['subcategory_2']
+                good['subCategory'] = good_type['subcategory_3']
+                good['cost'] = good_type['price']
+                good['goodTypeId'] = good_type['virtual_type']
+                good['goodCharacteristics'] = good_type['description']
+
+        return json_converter.JsonConverter().convert(good)

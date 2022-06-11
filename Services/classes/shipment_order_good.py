@@ -4,7 +4,7 @@ from django.db import models, connection
 class ShipmentOrderGood(models.Model):
 
     def get_order_goods(self, code=-1):
-        data = ""
+        data = []
         try:
             cursor = connection.cursor()
             if code == -1:
@@ -24,7 +24,7 @@ class ShipmentOrderGood(models.Model):
         return data
 
     def get_ordered_goods(self, code):
-        data = ""
+        data = []
         try:
             cursor = connection.cursor()
             cursor.execute(f"SELECT * FROM shipment_order_goods WHERE order_num={code} ORDER BY code ASC")

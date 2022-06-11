@@ -7,7 +7,7 @@ from ..converters.datetime_converter import DatetimeConverter
 class ShipmentOrder(models.Model):
 
     def get_orders(self, order=0, status='', name="", code=-1):
-        data = ""
+        data = []
 
         try:
             cursor = connection.cursor()

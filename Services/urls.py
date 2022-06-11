@@ -4,7 +4,10 @@ from . import views
 urlpatterns = [
     path('colors/', views.colors),
 
-    path('zones/', views.zones),
+    path('zones/',          views.zones, {'path': '/zones'}),
+    path('zones_post/',     views.zones, {'path': '/zones_post'}),
+    path('zones_update/',   views.zones, {'path': '/zones_update'}),
+    path('zones_delete/',   views.zones, {'path': '/zones_delete'}),
 
     path('zones_virtual/',                  views.zones_virtual, {'path': '/zones_virtual'}),
     path('zones_virtual_post/',             views.zones_virtual, {'path': '/zones_virtual_post'}),
@@ -32,6 +35,11 @@ urlpatterns = [
     path('goods_type_cats/',    views.types, {'path': '/goods_type_cats'}),
     path('goods_type/',         views.types, {'path': '/goods_type'}),
     path('update_inventory/',   views.types, {'path': '/update_inventory'}),
+
+    path('goods_type_virtual/', views.types_virtual, {'path': '/goods_type_virtual'}),
+    path('goods_type_insert/', views.types_virtual, {'path': '/goods_type_insert'}),
+    path('goods_type_update/', views.types_virtual, {'path': '/goods_type_update'}),
+    path('goods_type_delete/', views.types_virtual, {'path': '/goods_type_delete'}),
 
     path('goods_cat/',      views.categories, {'path': '/goods_cat'}),
     path('goods_subcat2/',  views.categories, {'path': '/goods_subcat2'}),
@@ -64,4 +72,6 @@ urlpatterns = [
     path('shipment_goods_id/',                  views.shipment_orders, {'path': '/shipment_goods_id'}),
     path('shipment_order_goods_id_all/',        views.shipment_orders, {'path': '/shipment_order_goods_id_all'}),
     path('shipment_order_goods_all/',           views.shipment_orders, {'path': '/shipment_order_goods_all'}),
+
+    path('warehouse_model/',   views.warehouse, {'path': '/warehouse_model'})
 ]

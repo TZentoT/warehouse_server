@@ -4,7 +4,7 @@ from django.db import models, connection
 class Color(models.Model):
 
     def get_color(self):
-        data = ""
+        data = []
         try:
             cursor = connection.cursor()
             cursor.execute('SELECT id,name FROM colors ORDER BY id ASC')

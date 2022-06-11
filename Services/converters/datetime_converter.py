@@ -7,7 +7,7 @@ class DatetimeConverter:
         data = ""
 
         try:
-            data = str(date).split('-')
+            data = str(date).split('.')
             print(data)
             data = datetime.date(int(data[0]), int(data[1]), int(data[2]))
         except Exception as e:

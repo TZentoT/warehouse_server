@@ -37,9 +37,9 @@ class OrderGoods(models.Model):
             for order in data:
                 for good in good_types:
                     if good["code"] == order["good_id"]:
+                        good["amount"] = order["amount"]
+                        good["price"] = order["price_one"]
                         goods.append(good)
-                        goods[-1]["amount"] = order["amount"]
-                        goods[-1]["price"] = order["price_one"]
 
             print(f"get_good_types_by_order res {goods}")
         except Exception as e:

@@ -8,7 +8,7 @@ from ..converters import json_converter
 class Client(models.Model):
 
     def get_client(self):
-        data = ""
+        data = []
         try:
             cursor = connection.cursor()
             cursor.execute('SELECT * FROM accounts ORDER BY code ASC')

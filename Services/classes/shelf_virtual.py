@@ -7,7 +7,7 @@ from asgiref.sync import sync_to_async
 class ShelfVirtual(models.Model):
 
     def get(self):
-        data = ""
+        data = []
         try:
             cursor = connection.cursor()
             cursor.execute('SELECT * FROM shelfs_virtual ORDER BY code ASC')

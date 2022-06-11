@@ -7,7 +7,7 @@ from asgiref.sync import sync_to_async
 class RackVirtual(models.Model):
 
     def get(self):
-        data = ""
+        data = []
         try:
             cursor = connection.cursor()
             cursor.execute('SELECT * FROM racks_virtual ORDER BY code ASC')

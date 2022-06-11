@@ -4,7 +4,7 @@ from django.db import models, connection
 class Subcategories4(models.Model):
 
     def get_categories(self):
-        data = ""
+        data = []
         try:
             cursor = connection.cursor()
             cursor.execute('SELECT * FROM goods_subcategories_4 ORDER BY code ASC')

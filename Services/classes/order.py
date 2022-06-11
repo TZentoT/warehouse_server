@@ -1,11 +1,15 @@
+import json
+
 from django.db import models, connection
 import datetime
+
+from Services.converters import json_converter
 
 
 class Order(models.Model):
 
     def get_orders(self, status_execution='', order_status=''):
-        data = ""
+        data = []
         try:
             cursor = connection.cursor()
             if status_execution != '' and order_status == '':
@@ -30,8 +34,10 @@ class Order(models.Model):
 
         return data
 
-    def update_orders(self, id):
-        data = ""
+    def update_orders(self, body):
+        data = json.loads(body)
+        data = json_converter.JsonConverter().convert(data)
+        id = json_converter.JsonConverter().convert(data)['id']
         try:
             cursor = connection.cursor()
             cursor.execute(f"UPDATE orders SET status_execution = '{'complited'}' WHERE id={id}")

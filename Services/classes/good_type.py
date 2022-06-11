@@ -7,7 +7,7 @@ from .categories import Categories
 class GoodType(models.Model):
 
     def get_good_types(self, code=-1):
-        data = ""
+        data = []
         try:
             cursor = connection.cursor()
             if code == -1:
@@ -19,7 +19,7 @@ class GoodType(models.Model):
             keys = ('code', 'name', 'article', 'category', 'subcategory_2', 'subcategory_3', 'subcategory_4',
                     'absolute_path', 'price', 'price_old', 'price_buy', 'amount', 'amount_ordered', 'amount_limit',
                     'description', 'description_short', 'specifications', 'brand', 'weight', 'color', 'photo',
-                    'photo_path', 'status', 'warranty')
+                    'photo_path', 'status', 'warranty', 'virtual_type')
             for row in rows:
                 result.append(dict(zip(keys, row)))
             data = result

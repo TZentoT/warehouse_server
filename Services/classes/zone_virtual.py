@@ -8,7 +8,7 @@ from ..converters import string_converter
 class ZoneVirtual(models.Model):
 
     def get(self):
-        data = ""
+        data = []
         try:
             cursor = connection.cursor()
             cursor.execute('SELECT * FROM zones_virtual ORDER BY code ASC')

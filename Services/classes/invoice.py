@@ -6,7 +6,7 @@ from Services.converters import datetime_converter
 class Invoice(models.Model):
 
     def get(self, status=""):
-        data = ""
+        data = []
         try:
             cursor = connection.cursor()
             if status == "":

@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from .classes import zone, color, rack, client, order, good_type, shipment_order, \
     shipment_order_good, order_good, categories, subcategories_2, subcategories_3, subcategories_4, shelf, \
-    shelf_space, rack_virtual, zone_virtual, shelf_virtual
+    shelf_space, rack_virtual, zone_virtual, shelf_virtual, goods_type_virtual
 from .sub_classes import orders_requests
 from .converters import string_converter, json_converter
 
@@ -14,15 +14,31 @@ def colors(request, *args):
     return HttpResponse(string_converter.StringConverter().convert(result))
 
 
-def zones(request, *args):
-    result = json_converter.JsonConverter().convert(zone.Zone().get_zone())
+def zones(request, path):
+    result = ""
+
+    if path == '/zones':
+        result = json_converter.JsonConverter().convert(zone.Zone().get_zone())
+
+    if path == '/zones_post':
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(zone.Zone().insert(body))
+
+    if path == '/zones_update':
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(zone.Zone().update(body))
+
+    if path == '/zones_delete':
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(zone.Zone().delete(body))
+
     return HttpResponse(string_converter.StringConverter().convert(result))
 
 
 def zones_virtual(request, path):
     result = ""
     if path == '/zones_virtual':
-        result = json_converter.JsonConverter().convert(zone_virtual.ZoneVirtual().get())
+        result = zone_virtual.ZoneVirtual().get()
 
     if path == '/zones_virtual_post':
         body = request.body.decode('UTF-8')
@@ -55,7 +71,8 @@ def racks_virtual(request, path):
         result = json_converter.JsonConverter().convert(rack_virtual.RackVirtual().get())
 
     if path == '/racks_virtual_shelves':
-        result = json_converter.JsonConverter().convert(orders_requests.Orders().get_virtual_rack_with_shelves())
+        result = orders_requests.Orders().get_virtual_rack_with_shelves()
+        print(f"res: {result}")
 
     if path == '/racks_virtual_post':
         body = request.body.decode('UTF-8')
@@ -76,7 +93,7 @@ def racks_virtual(request, path):
 def shelfs(request, path):
     result = ""
     if path == "/shelfs":
-        result = json_converter.JsonConverter().convert(json_converter.JsonConverter().convert(shelf.Shelf().get_shelfs()))
+        result = json_converter.JsonConverter().convert(shelf.Shelf().get_shelfs())
 
     if path == "/shelfs_by_racks":
         result = "getShipmentOrderGoods"
@@ -158,7 +175,6 @@ def orders(request, path):
 
     if path == "/orders_all":
         status = request.GET.get('status')
-        print(status)
         result = json_converter.JsonConverter().convert(order.Order().get_orders(status))
 
     if path == "/orders_goods":
@@ -182,8 +198,8 @@ def orders(request, path):
         result = json_converter.JsonConverter().convert(orders_requests.update_order_goods_expend(code, amount))
 
     if path == "/update_order_status":
-        id = request.GET.get("id")
-        result = json_converter.JsonConverter().convert(order.Order().update_orders(id))
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(order.Order().update_orders(body))
 
     if path == "/post_order":
         body = request.body.decode('UTF-8')
@@ -219,6 +235,29 @@ def types(request, path):
 
     if path == "/update_inventory":
         result = "updateInventory"
+
+    return HttpResponse(string_converter.StringConverter().convert(result))
+
+
+def types_virtual(request, path):
+    result = ""
+
+    if path == "/goods_type_virtual":
+        result = goods_type_virtual.GoodsTypeVirtual().get()
+
+    if path == "/goods_type_insert":
+        body = request.body.decode('UTF-8')
+        result = goods_type_virtual.GoodsTypeVirtual().insert(body)
+
+    if path == "/goods_type_update":
+        body = request.body.decode('UTF-8')
+        id = body['id']
+        result = goods_type_virtual.GoodsTypeVirtual().update(id, body)
+
+    if path == "/goods_type_delete":
+        body = request.body.decode('UTF-8')
+        id = body['id']
+        result = goods_type_virtual.GoodsTypeVirtual().delete(id)
 
     return HttpResponse(string_converter.StringConverter().convert(result))
 
@@ -261,4 +300,11 @@ def shelf_spaces(request, path):
     return HttpResponse(string_converter.StringConverter().convert(result))
 
 
+def warehouse(request, path):
+    result = ""
+
+    if path == "/warehouse_model":
+        result = orders_requests.Orders().get_warehouse_model()
+
+    return HttpResponse(string_converter.StringConverter().convert(result))
 

@@ -3,11 +3,14 @@ from django.db import models, connection
 
 class ShelfSpace(models.Model):
 
-    def get_shelf_space(self):
-        data = ""
+    def get_shelf_space(self, shelf_num=0):
+        data = []
         try:
             cursor = connection.cursor()
-            cursor.execute('SELECT * FROM shelf_space ORDER BY code ASC')
+            if shelf_num == 0:
+                cursor.execute('SELECT * FROM shelf_space ORDER BY code ASC')
+            if shelf_num != 0:
+                cursor.execute(f"SELECT * FROM shelf_space WHERE shelf_num={shelf_num} ORDER BY code ASC")
             rows = cursor.fetchall()
             result = []
             keys = ('code', 'good', 'amount', 'shelf_num', 'status')
