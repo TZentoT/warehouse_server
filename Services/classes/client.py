@@ -43,20 +43,23 @@ class Client(models.Model):
         return data
 
     def update_existing_client(self, client):
-        data = ""
+        data = client
+        data = json.loads(data)
+        data = json_converter.JsonConverter().convert(data)
         try:
             cursor = connection.cursor()
-            cursor.execute(f"UPDATE accounts SET name='{client['name']}', surname='{client['surname']}',"
-                           f"patronymic='{client['patronymic']}', "
-                           f"login='{client['login']}', password='{client['password']}', phone_num='{client['phone_num']}',"
-                           f"duty='{client['duty']}' WHERE code={client['code']}")
-            # rows = cursor.fetchall()
-            # result = []
-            # keys = ("code", "name", "surname", "patronymic", "avatar", "login", "password", "phone_num", "duty")
-            # for row in rows:
-            #     result.append(dict(zip(keys, row)))
-            # print(f'res {result}')
-            # data = result
+            if data['duty'] != "":
+                cursor.execute(f"UPDATE accounts SET name='{data['name']}', surname='{data['surname']}',"
+                           f"patronymic='{data['patronymic']}', "
+                           f"login='{data['login']}', password='{data['password']}', phone_num='{data['phone_num']}',"
+                           f"duty='{data['duty']}' WHERE code={data['code']}")
+            if data['duty'] == "":
+                cursor.execute(f"UPDATE accounts SET name='{data['name']}', surname='{data['surname']}',"
+                               f"patronymic='{data['patronymic']}', "
+                               f"login='{data['login']}', password='{data['password']}', "
+                               f"phone_num='{data['phone_num']}', avatar='{data['preview']}'"
+                               f"WHERE code={data['code']}")
+
         except Exception as e:
             print(f"update_existing_client went wrong: {e}")
 
@@ -67,13 +70,6 @@ class Client(models.Model):
         try:
             cursor = connection.cursor()
             cursor.execute(f'DELETE FROM accounts WHERE code={client["code"]}')
-            rows = cursor.fetchall()
-            result = []
-            keys = ("code", "name", "surname", "patronymic", "avatar", "login", "password", "phone_num", "duty")
-            for row in rows:
-                result.append(dict(zip(keys, row)))
-            print(f'res {result}')
-            data = result
         except Exception as e:
             print(f"delete_existing_client went wrong: {e}")
 
@@ -111,3 +107,20 @@ class Client(models.Model):
                 self.insert_new_cliend(new_client)
 
         return b'Datatable updated'
+
+    def get_img_avatar(self, id):
+        data = ""
+        try:
+            cursor = connection.cursor()
+            cursor.execute(f'SELECT avatar FROM accounts WHERE code={id}')
+            rows = cursor.fetchall()
+            result = []
+            keys = ("avatar")
+            for row in rows:
+                result.append(dict(zip(keys, row)))
+            print(f'res {result}')
+            data = result
+        except Exception as e:
+            print(f"delete_existing_client went wrong: {e}")
+
+        return data

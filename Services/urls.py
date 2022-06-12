@@ -16,6 +16,9 @@ urlpatterns = [
 
     path('racks/',          views.racks, {'path': '/racks'}),
     path('racks_by_zone/',  views.racks, {'path': '/racks_by_zone'}),
+    path('racks_post/',     views.racks, {'path': '/racks_post'}),
+    path('racks_update/',   views.racks, {'path': '/racks_update'}),
+    path('racks_delete/',   views.racks, {'path': '/racks_delete'}),
 
     path('racks_virtual/',          views.racks_virtual, {'path': '/racks_virtual'}),
     path('racks_virtual_shelves/',  views.racks_virtual, {'path': '/racks_virtual_shelves'}),
@@ -36,18 +39,21 @@ urlpatterns = [
     path('goods_type/',         views.types, {'path': '/goods_type'}),
     path('update_inventory/',   views.types, {'path': '/update_inventory'}),
 
-    path('goods_type_virtual/', views.types_virtual, {'path': '/goods_type_virtual'}),
-    path('goods_type_insert/', views.types_virtual, {'path': '/goods_type_insert'}),
-    path('goods_type_update/', views.types_virtual, {'path': '/goods_type_update'}),
-    path('goods_type_delete/', views.types_virtual, {'path': '/goods_type_delete'}),
+    path('goods_type_virtual/',             views.types_virtual, {'path': '/goods_type_virtual'}),
+    path('goods_type_with_virtual_info/',   views.types_virtual, {'path': '/goods_type_with_virtual_info'}),
+    path('goods_type_insert/',              views.types_virtual, {'path': '/goods_type_insert'}),
+    path('goods_type_update/',              views.types_virtual, {'path': '/goods_type_update'}),
+    path('goods_type_delete/',              views.types_virtual, {'path': '/goods_type_delete'}),
 
     path('goods_cat/',      views.categories, {'path': '/goods_cat'}),
     path('goods_subcat2/',  views.categories, {'path': '/goods_subcat2'}),
     path('goods_subcat3/',  views.categories, {'path': '/goods_subcat3'}),
     path('goods_subcat4/',  views.categories, {'path': '/goods_subcat4'}),
 
-    path('clients/',    views.clients, {'path': '/clients'}),
-    path('post_user/',  views.clients, {'path': '/post_user'}),
+    path('clients/',      views.clients, {'path': '/clients'}),
+    path('post_user/',    views.clients, {'path': '/post_user'}),
+    path('update_user/',  views.clients, {'path': '/update_user'}),
+    path('client_avatar/',  views.clients, {'path': '/client_avatar'}),
 
     path('orders/',                         views.orders, {'path': '/orders'}),
     path('shipment_order_goods_by_order/',  views.orders, {'path': '/shipment_order_goods_by_order'}),

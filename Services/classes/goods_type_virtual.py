@@ -1,4 +1,10 @@
+import json
+
 from django.db import models, connection
+
+from Services.converters import json_converter
+
+from .good_type import GoodType
 
 
 class GoodsTypeVirtual(models.Model):
@@ -10,7 +16,7 @@ class GoodsTypeVirtual(models.Model):
             cursor.execute('SELECT * FROM goods_type_virtual ORDER BY id ASC')
             rows = cursor.fetchall()
             result = []
-            keys = ('id', 'width', 'height', 'depth', 'color', 'translation')
+            keys = ('id', 'width', 'height', 'depth', 'color', 'translation', 'name')
             for row in rows:
                 result.append(dict(zip(keys, row)))
             print(f'GoodsTypeVirtual get res {result}')
@@ -22,27 +28,29 @@ class GoodsTypeVirtual(models.Model):
         return data
 
     def insert(self, body):
-        data = ""
+        data = body
+        data = json.loads(data)
+        data = json_converter.JsonConverter().convert(data)
         try:
-            new_id = self.get()[-1]['id'] + 1
             cursor = connection.cursor()
-            cursor.execute(f"INSERT INTO goods_type_virtual (id, width, height, depth, color, translation)"
-                           f"VALUES ({new_id}, {body['width']}, {body['height']}, {body['depth']}, "
-                           f"{body['color']}, {body['translation']})")
-            print(f'GoodsTypeVirtual insert res {new_id}')
-            data = new_id
+            cursor.execute(f"INSERT INTO goods_type_virtual (id, width, height, depth, color, translation, name)"
+                           f"VALUES ({data['id']}, {data['width']}, {data['height']}, {data['depth']}, "
+                           f"'{data['color']}', '{data['translation']}', '{data['name']}')")
+            print(f'GoodsTypeVirtual insert res {data}')
         except Exception as e:
             print(f"GoodsTypeVirtual insert went wrong: {e}")
 
         return data
 
-    def update(self, id, body):
-        data = ""
+    def update(self, body):
+        data = body
+        data = json.loads(data)
+        data = json_converter.JsonConverter().convert(data)
         try:
             cursor = connection.cursor()
-            cursor.execute(f"UPDATE goods_type_virtual SET width={body['width']}, height={body['height']}, "
-                           f"depth={body['depth']}, color={body['color']}, "
-                           f"translation={body['translation']} WHERE id={id}")
+            cursor.execute(f"UPDATE goods_type_virtual SET width={data['width']}, height={data['height']}, "
+                           f"depth={data['depth']}, color='{data['color']}', name='{data['good_name']}', "
+                           f"translation='{data['translation']}' WHERE id={data['id']}")
             print(f'GoodsTypeVirtual update res {data}')
         except Exception as e:
             print(f"GoodsTypeVirtual update went wrong: {e}")
@@ -50,12 +58,22 @@ class GoodsTypeVirtual(models.Model):
         return data
 
     def delete(self, id):
-        data = ""
+        data = id
+        data = json.loads(data)
+        data = json_converter.JsonConverter().convert(data)
         try:
-            cursor = connection.cursor()
-            cursor.execute('DELETE from goods_type_virtual WHERE id={id}')
-            print(f'GoodsTypeVirtual delete res {data}')
-            data = data
+            is_possible_to_delete = True
+            goods_type = GoodType().get_good_types()
+            for good_type in goods_type:
+                if good_type['virtual_type'] == data['id']:
+                    is_possible_to_delete = False
+            if is_possible_to_delete:
+                cursor = connection.cursor()
+                cursor.execute(f"DELETE from goods_type_virtual WHERE id={data['id']}")
+                print(f'GoodsTypeVirtual delete res {data}')
+                data = "Тип товара успешно удален"
+            else:
+                data = "Невозможно удалить. Некоторые товары привязаны к данному типу товара"
         except Exception as e:
             print(f"GoodsTypeVirtual delete went wrong: {e}")
 

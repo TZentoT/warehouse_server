@@ -34,7 +34,7 @@ class Shelf(models.Model):
         data = body
         data = json.loads(data)
         data = json_converter.JsonConverter().convert(data)
-        print(f"Zone insert {data}")
+        print(f"Shelf insert {data}")
         try:
             cursor = connection.cursor()
             cursor.execute(f"INSERT INTO shelfs (code, name, shelf_num, rack_num, capacity) "
@@ -51,7 +51,7 @@ class Shelf(models.Model):
         data = body
         data = json.loads(data)
         data = json_converter.JsonConverter().convert(data)
-        print(f"Zone update {data}")
+        print(f"Shelf update {data}")
         try:
             cursor = connection.cursor()
             cursor.execute(f"UPDATE shelfs SET name='{data['name']}', shelf_num='{data['shelf_num']}', "

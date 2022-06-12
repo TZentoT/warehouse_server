@@ -62,6 +62,18 @@ def racks(request, path):
     if path == '/racks_by_zone':
         result = json_converter.JsonConverter().convert(rack.Rack().get_rack(1))
 
+    if path == '/racks_post':
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(rack.Rack().insert(body))
+
+    if path == '/racks_update':
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(rack.Rack().update(body))
+
+    if path == '/racks_delete':
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(rack.Rack().delete(body))
+
     return HttpResponse(string_converter.StringConverter().convert(result))
 
 
@@ -80,12 +92,11 @@ def racks_virtual(request, path):
 
     if path == '/racks_virtual_update':
         body = request.body.decode('UTF-8')
-        id = body['code']
-        result = json_converter.JsonConverter().convert(rack_virtual.RackVirtual().update(id, body))
+        result = json_converter.JsonConverter().convert(rack_virtual.RackVirtual().update(body))
 
     if path == '/racks_virtual_delete':
-        id = request.body.decode('UTF-8')['id']
-        result = json_converter.JsonConverter().convert(rack_virtual.RackVirtual().delete(id))
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(rack_virtual.RackVirtual().delete(body))
 
     return HttpResponse(string_converter.StringConverter().convert(result))
 
@@ -214,9 +225,17 @@ def clients(request, path):
     if path == "/clients":
         result = json_converter.JsonConverter().convert(client.Client().get_client())
 
+    if path == "/client_avatar":
+        id = request.GET.get('id')
+        result = json_converter.JsonConverter().convert(client.Client().get_img_avatar(id))
+
     if path == "/post_user":
         body = request.body.decode('UTF-8')
         result = json_converter.JsonConverter().convert(client.Client().update_client_datatable(body))
+
+    if path == "/update_user":
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(client.Client().update_existing_client(body))
 
     return HttpResponse(string_converter.StringConverter().convert(result))
 
@@ -245,19 +264,20 @@ def types_virtual(request, path):
     if path == "/goods_type_virtual":
         result = goods_type_virtual.GoodsTypeVirtual().get()
 
+    if path == "/goods_type_with_virtual_info":
+        result = orders_requests.Orders().get_goods_type_with_virtual_params()
+
     if path == "/goods_type_insert":
         body = request.body.decode('UTF-8')
         result = goods_type_virtual.GoodsTypeVirtual().insert(body)
 
     if path == "/goods_type_update":
         body = request.body.decode('UTF-8')
-        id = body['id']
-        result = goods_type_virtual.GoodsTypeVirtual().update(id, body)
+        result = goods_type_virtual.GoodsTypeVirtual().update(body)
 
     if path == "/goods_type_delete":
         body = request.body.decode('UTF-8')
-        id = body['id']
-        result = goods_type_virtual.GoodsTypeVirtual().delete(id)
+        result = goods_type_virtual.GoodsTypeVirtual().delete(body)
 
     return HttpResponse(string_converter.StringConverter().convert(result))
 

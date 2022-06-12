@@ -16,6 +16,7 @@ from ..classes.invoice import Invoice
 from ..classes.shelf_virtual import ShelfVirtual
 from ..classes.rack_virtual import RackVirtual
 from ..classes.zone_virtual import ZoneVirtual
+from ..classes.goods_type_virtual import GoodsTypeVirtual
 
 from ..converters import json_converter, string_converter
 
@@ -385,3 +386,21 @@ class Orders(models.Model):
                 good['goodCharacteristics'] = good_type['description']
 
         return json_converter.JsonConverter().convert(good)
+
+    def get_goods_type_with_virtual_params(self):
+        data = []
+        goods_type_virtual = GoodsTypeVirtual().get()
+
+        for good_type_virtual in goods_type_virtual:
+            body = {
+                'virtual_id': good_type_virtual['id'],
+                'text': good_type_virtual['name'],
+                'depth': good_type_virtual['depth'],
+                'width': good_type_virtual['width'],
+                'height': good_type_virtual['height'],
+                'color': good_type_virtual['color'],
+                'translation': good_type_virtual['translation']
+            }
+            data.append(body)
+
+        return data
