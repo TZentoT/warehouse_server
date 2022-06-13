@@ -45,11 +45,12 @@ def zones_virtual(request, path):
         result = json_converter.JsonConverter().convert(zone_virtual.ZoneVirtual().insert(body))
 
     if path == '/zones_virtual_update':
-        result = json_converter.JsonConverter().convert(zone_virtual.ZoneVirtual().get())
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(zone_virtual.ZoneVirtual().update(body))
 
     if path == '/zones_virtual_delete':
         body = request.body.decode('UTF-8')
-        result = json_converter.JsonConverter().convert(zone_virtual.ZoneVirtual().insert(body))
+        result = json_converter.JsonConverter().convert(zone_virtual.ZoneVirtual().delete(body))
 
     return HttpResponse(string_converter.StringConverter().convert(result))
 

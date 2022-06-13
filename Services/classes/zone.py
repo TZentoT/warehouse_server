@@ -11,14 +11,16 @@ from Services.converters import json_converter, string_converter
 
 class Zone(models.Model):
 
-    def get_zone(self, name=""):
+    def get_zone(self, name="", zone_type_id=-1):
         data = []
         try:
             cursor = connection.cursor()
-            if name == "":
+            if name == "" and zone_type_id == -1:
                 cursor.execute('SELECT * FROM zones ORDER BY code ASC')
-            if name != "":
+            if name != "" and zone_type_id == -1:
                 cursor.execute(f"SELECT * FROM zones WHERE name LIKE '{name}'")
+            if name == "" and zone_type_id != -1:
+                cursor.execute(f"SELECT * FROM zones WHERE zone_type_id={zone_type_id}")
             rows = cursor.fetchall()
             result = []
             keys = ('code', 'name', 'zone_num', 'center_point', 'rotation', 'zone_type_id', 'type')
