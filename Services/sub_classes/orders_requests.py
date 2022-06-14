@@ -353,6 +353,7 @@ class Orders(models.Model):
 
     def get_warehouse_model(self):
         zones = Zone().get_zone()
+        iterator = 0
         for zone in zones:
             racks = Rack().get_rack("", zone['code'])
             zone_buf = []
@@ -363,7 +364,8 @@ class Orders(models.Model):
                     goods_stored = ShelfSpace().get_shelf_space(shelf['code'])
                     good_with_all_info = []
                     for good in goods_stored:
-                        good_with_all_info.append(self.get_good_stored_with_all_info(good))
+                        good_with_all_info.append(self.get_good_stored_with_all_info(good, iterator))
+                        iterator += 1
                     shelf['space'] = good_with_all_info
                     shelf_buf.append(shelf)
 
@@ -373,17 +375,20 @@ class Orders(models.Model):
 
         return zones
 
-    def get_good_stored_with_all_info(self, good):
+    def get_good_stored_with_all_info(self, good, good_id):
         goods_type = GoodType().get_good_types_with_cats()
 
         for good_type in goods_type:
             if good_type['code'] == good['good']:
+                good['id'] = good_id
                 good['name'] = good_type['name']
                 good['category'] = good_type['subcategory_2']
                 good['subCategory'] = good_type['subcategory_3']
                 good['cost'] = good_type['price']
                 good['goodTypeId'] = good_type['virtual_type']
+                good['weight'] = good_type['weight']
                 good['goodCharacteristics'] = good_type['description']
+
 
         return json_converter.JsonConverter().convert(good)
 
