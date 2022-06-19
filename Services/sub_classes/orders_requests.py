@@ -409,3 +409,16 @@ class Orders(models.Model):
             data.append(body)
 
         return data
+
+    def get_zones_racks_shelves(self):
+        data = []
+        zones = Zone().get_zone()
+        for zone in zones:
+            racks = Rack().get_rack("", zone['code'])
+            zone['racks'] = racks
+            for rack in racks:
+                shelves = Shelf().get_shelfs("", rack['code'])
+                rack['shelves'] = shelves
+        data = zones
+
+        return data

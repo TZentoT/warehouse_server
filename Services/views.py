@@ -253,6 +253,10 @@ def types(request, path):
     if path == "/goods_type":
         result = json_converter.JsonConverter().convert(good_type.GoodType().get_good_types())
 
+    if path == "/goods_type_post":
+        body = request.body.decode('UTF-8')
+        result = json_converter.JsonConverter().convert(good_type.GoodType().insert(body))
+
     if path == "/update_inventory":
         result = "updateInventory"
 
@@ -326,6 +330,9 @@ def warehouse(request, path):
 
     if path == "/warehouse_model":
         result = orders_requests.Orders().get_warehouse_model()
+
+    if path == "/warehouse_all_types":
+        result = orders_requests.Orders().get_zones_racks_shelves()
 
     return HttpResponse(string_converter.StringConverter().convert(result))
 

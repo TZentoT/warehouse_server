@@ -44,20 +44,21 @@ class Client(models.Model):
 
     def update_existing_client(self, client):
         data = client
-        data = json.loads(data)
-        data = json_converter.JsonConverter().convert(data)
+        # data = json.loads(data)
+        # data = json_converter.JsonConverter().convert(data)
         try:
             cursor = connection.cursor()
             if data['duty'] != "":
+                print(f"data: {client}")
                 cursor.execute(f"UPDATE accounts SET name='{data['name']}', surname='{data['surname']}',"
                            f"patronymic='{data['patronymic']}', "
-                           f"login='{data['login']}', password='{data['password']}', phone_num='{data['phone_num']}',"
+                           f"login='{data['login']}', password='{data['password']}', phone_num='{data['phone']}',"
                            f"duty='{data['duty']}' WHERE code={data['code']}")
             if data['duty'] == "":
                 cursor.execute(f"UPDATE accounts SET name='{data['name']}', surname='{data['surname']}',"
                                f"patronymic='{data['patronymic']}', "
                                f"login='{data['login']}', password='{data['password']}', "
-                               f"phone_num='{data['phone_num']}', avatar='{data['preview']}'"
+                               f"phone_num='{data['phone']}', avatar='{data['preview']}'"
                                f"WHERE code={data['code']}")
 
         except Exception as e:

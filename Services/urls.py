@@ -37,6 +37,7 @@ urlpatterns = [
     path('goods_type_code/',    views.types, {'path': '/goods_type_code'}),
     path('goods_type_cats/',    views.types, {'path': '/goods_type_cats'}),
     path('goods_type/',         views.types, {'path': '/goods_type'}),
+    path('goods_type_post/',    views.types, {'path': '/goods_type_post'}),
     path('update_inventory/',   views.types, {'path': '/update_inventory'}),
 
     path('goods_type_virtual/',             views.types_virtual, {'path': '/goods_type_virtual'}),
@@ -79,5 +80,6 @@ urlpatterns = [
     path('shipment_order_goods_id_all/',        views.shipment_orders, {'path': '/shipment_order_goods_id_all'}),
     path('shipment_order_goods_all/',           views.shipment_orders, {'path': '/shipment_order_goods_all'}),
 
-    path('warehouse_model/',   views.warehouse, {'path': '/warehouse_model'})
+    path('warehouse_model/',       views.warehouse, {'path': '/warehouse_model'}),
+    path('warehouse_all_types/',   views.warehouse, {'path': '/warehouse_all_types'})
 ]
