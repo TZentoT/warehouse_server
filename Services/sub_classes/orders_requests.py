@@ -415,12 +415,12 @@ class Orders(models.Model):
         zones = Zone().get_zone()
         for zone in zones:
             racks = Rack().get_rack("", zone['code'])
-            racks.insert(0, {'menuItem': ""})
-            zone['racks'] = racks
             for rack in racks:
                 shelves = Shelf().get_shelfs("", rack['code'])
                 shelves.insert(0, {'menuItem': ""})
                 rack['shelves'] = shelves
+            racks.insert(0, {'menuItem': ""})
+            zone['racks'] = racks
         data = zones
 
         return data
