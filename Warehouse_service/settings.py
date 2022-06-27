@@ -55,12 +55,14 @@ MIDDLEWARE = [
 
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = (
-  'http://localhost:8000',
-  'http://localhost:3000',
+    'http://localhost:8000',
+    'http://localhost:3000',
+    'www.sklad.website',
+    'sklad.website',
 )
 
 # CSRF_TRUSTED_ORIGINS = ['https://*.mydomain.com','https://*.127.0.0.1']
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000','www.sklad.website', 'sklad.website']
 
 ROOT_URLCONF = 'Warehouse_service.urls'
 
