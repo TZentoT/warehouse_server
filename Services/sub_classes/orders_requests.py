@@ -424,3 +424,23 @@ class Orders(models.Model):
         data = zones
 
         return data
+
+    def update_insert_goods_types(self, body):
+        data = body
+        if body != {}:
+            data = json.loads(data)
+            data = json_converter.JsonConverter().convert(data)
+        goods_type = GoodType().get_good_types()
+
+        print(f"good_type['code'] {goods_type[0]['code']}")
+        print(f"elm['code'] {data['code']}")
+
+        isNew = True
+        for good_type in goods_type:
+            if good_type['code'] == data['code']:
+                isNew = False
+                GoodType().update(0, 0, data)
+                break
+
+        if isNew:
+            GoodType().insert(data)

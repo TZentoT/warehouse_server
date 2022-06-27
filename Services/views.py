@@ -255,7 +255,7 @@ def types(request, path):
 
     if path == "/goods_type_post":
         body = request.body.decode('UTF-8')
-        result = json_converter.JsonConverter().convert(good_type.GoodType().insert(body))
+        result = json_converter.JsonConverter().convert(orders_requests.Orders().update_insert_goods_types(body))
 
     if path == "/update_inventory":
         result = "updateInventory"

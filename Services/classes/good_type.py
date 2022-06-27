@@ -53,20 +53,37 @@ class GoodType(models.Model):
 
         return data
 
-    def update(self, amount, code):
-        data = ""
+    def update(self, amount=0, code=0, body={}):
+        data = body
         try:
             cursor = connection.cursor()
-            cursor.execute(f"UPDATE goods_type SET amount=amount - {amount} WHERE code={code}")
+            if amount != 0 and code != 0 and body == {}:
+                cursor.execute(f"UPDATE goods_type SET amount=amount - {amount} WHERE code={code}")
+            if amount == 0 and code == 0 and body != {}:
+                goods_cat_2 = Subcategories2().get_subcategories()
+                good_cat_2 = ""
+                for good_cat in goods_cat_2:
+                    if good_cat['name'] == data['goodsCategories2']:
+                        good_cat_2 = good_cat['code']
+                goods_cat_3 = Subcategories3().get_subcategories()
+                good_cat_3 = ""
+                for good_cat in goods_cat_3:
+                    if good_cat['name'] == data['goodsCategories3']:
+                        good_cat_3 = good_cat['code']
+
+                cursor.execute(f"UPDATE goods_type SET subcategory_2={good_cat_2}, subcategory_3={good_cat_3}, "
+                               f"name='{data['goodsType']}', amount_limit={data['goodsLimit']}, "
+                               f"amount={data['amountOnWarehouse']},  description='{data['description']}', "
+                               f"price={data['cost']} WHERE code={data['code']}")
         except Exception as e:
-            print(f"get_good_types went wrong: {e}")
+            print(f"GoodType update went wrong: {e}")
 
         return data
 
     def insert(self, body):
         data = body
-        data = json.loads(data)
-        data = json_converter.JsonConverter().convert(data)
+        # data = json.loads(data)
+        # data = json_converter.JsonConverter().convert(data)
         try:
             cursor = connection.cursor()
             new_id = self.get_good_types()[-1]['code']+1
